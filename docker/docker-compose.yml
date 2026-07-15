@@ -29,6 +29,7 @@ services:
         chown -R frappe:frappe /home/frappe/frappe-bench
         exec su frappe -s /bin/bash -c '
         set -e
+        export PATH="/home/frappe/.local/bin:/home/frappe/.pyenv/shims:/home/frappe/.pyenv/bin:$${NVM_DIR}/versions/node/v$${NODE_VERSION_DEVELOP}/bin:$${PATH}"
 
         SITE_NAME="$${SITE_NAME:-hrms.localhost}"
         ADMIN_PASSWORD="$${ADMIN_PASSWORD:-admin}"
