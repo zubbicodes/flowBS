@@ -17,7 +17,9 @@ services:
     restart: unless-stopped
 
   frappe:
-    image: frappe/bench:latest
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     restart: unless-stopped
     command: bash /workspace/docker/init.sh
     depends_on:
@@ -31,7 +33,6 @@ services:
       - DEVELOPER_MODE=${DEVELOPER_MODE:-0}
     working_dir: /home/frappe
     volumes:
-      - ..:/workspace
       - frappe-bench:/home/frappe/frappe-bench
     expose:
       - "8000"

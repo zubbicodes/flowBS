@@ -11,6 +11,8 @@ Use this folder as a Docker Compose deployment in Coolify.
 
 The `:8000` in the Coolify domain tells Coolify to route traffic to port 8000 inside the `frappe` container. It does not publish host port 8000, so you can deploy this compose stack multiple times for different clients on the same Coolify server.
 
+The `frappe` service builds from `docker/Dockerfile`, which copies this repository into `/workspace`. Do not add a host bind mount for `/workspace` in Coolify; the app source is already inside the image.
+
 ## Required environment variables
 
 Set these in Coolify before deploying:
