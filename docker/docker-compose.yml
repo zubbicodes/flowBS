@@ -94,6 +94,7 @@ services:
           if [ -f "apps/$${HRMS_APP_DIR}/roster/package.json" ]; then
             yarn --cwd "apps/$${HRMS_APP_DIR}/roster" install --check-files
           fi
+          grep -qxF "hrms" sites/apps.txt || echo "hrms" >> sites/apps.txt
           bench build --app hrms
           if ! bench --site "$${SITE_NAME}" list-apps | grep -qx "hrms"; then
             echo "Installing HRMS on existing site $${SITE_NAME}"
