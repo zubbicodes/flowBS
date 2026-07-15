@@ -9,7 +9,7 @@ Use this folder as a Docker Compose deployment in Coolify.
 - Public service: `frappe`
 - Domain: `https://your-hrms-domain.com:8000`
 
-The `:8000` in the Coolify domain tells Coolify to route traffic to port 8000 inside the `frappe` container. Coolify will still expose the site on normal HTTPS.
+The `:8000` in the Coolify domain tells Coolify to route traffic to port 8000 inside the `frappe` container. It does not publish host port 8000, so you can deploy this compose stack multiple times for different clients on the same Coolify server.
 
 ## Required environment variables
 
