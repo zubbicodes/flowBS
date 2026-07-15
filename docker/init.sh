@@ -1,4 +1,10 @@
-#!bin/bash
+#!/bin/bash
+set -e
+
+SITE_NAME="${SITE_NAME:-hrms.localhost}"
+ADMIN_PASSWORD="${ADMIN_PASSWORD:-admin}"
+MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-123}"
+DEVELOPER_MODE="${DEVELOPER_MODE:-0}"
 
 if [ -d "/home/frappe/frappe-bench/apps/frappe" ]; then
     echo "Bench already exists, skipping init"
@@ -9,6 +15,8 @@ else
 fi
 
 export PATH="${NVM_DIR}/versions/node/v${NODE_VERSION_DEVELOP}/bin/:${PATH}"
+git config --global --add safe.directory /workspace
+git config --global --add safe.directory /workspace/.git
 
 bench init --skip-redis-config-generation frappe-bench
 
@@ -25,18 +33,24 @@ sed -i '/redis/d' ./Procfile
 sed -i '/watch/d' ./Procfile
 
 bench get-app erpnext
-bench get-app hrms
+bench get-app /workspace
 
-bench new-site hrms.localhost \
---force \
---mariadb-root-password 123 \
---admin-password admin \
---no-mariadb-socket
+if [ ! -f "sites/${SITE_NAME}/site_config.json" ]; then
+    bench new-site "${SITE_NAME}" \
+    --force \
+    --mariadb-root-password "${MYSQL_ROOT_PASSWORD}" \
+    --admin-password "${ADMIN_PASSWORD}" \
+    --no-mariadb-socket
 
-bench --site hrms.localhost install-app hrms
-bench --site hrms.localhost set-config developer_mode 1
-bench --site hrms.localhost enable-scheduler
-bench --site hrms.localhost clear-cache
-bench use hrms.localhost
+    bench --site "${SITE_NAME}" install-app erpnext
+    bench --site "${SITE_NAME}" install-app hrms
+else
+    echo "Site ${SITE_NAME} already exists, skipping site creation"
+fi
+
+bench --site "${SITE_NAME}" set-config developer_mode "${DEVELOPER_MODE}"
+bench --site "${SITE_NAME}" enable-scheduler
+bench --site "${SITE_NAME}" clear-cache
+bench use "${SITE_NAME}"
 
 bench start
