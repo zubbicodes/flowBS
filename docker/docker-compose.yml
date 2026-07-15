@@ -19,10 +19,15 @@ services:
   frappe:
     image: frappe/bench:latest
     restart: unless-stopped
+    user: root
     command:
       - bash
       - -lc
       - |
+        set -e
+        mkdir -p /home/frappe/frappe-bench
+        chown -R frappe:frappe /home/frappe/frappe-bench
+        exec su frappe -s /bin/bash -c '
         set -e
 
         SITE_NAME="$${SITE_NAME:-hrms.localhost}"
@@ -49,7 +54,7 @@ services:
         rm -rf "$${INIT_DIR}"
 
         bench init --skip-redis-config-generation "$${INIT_DIR}"
-        cp -a "$${INIT_DIR}/." "$${BENCH_DIR}/"
+        cp -R "$${INIT_DIR}/." "$${BENCH_DIR}/"
         rm -rf "$${INIT_DIR}"
         cd "$${BENCH_DIR}"
 
@@ -58,8 +63,8 @@ services:
         bench set-redis-queue-host redis://redis:6379
         bench set-redis-socketio-host redis://redis:6379
 
-        sed -i '/redis/d' ./Procfile
-        sed -i '/watch/d' ./Procfile
+        sed -i "/redis/d" ./Procfile
+        sed -i "/watch/d" ./Procfile
 
         bench get-app erpnext
         bench get-app "$${HRMS_GIT_URL}" --branch "$${HRMS_BRANCH}"
@@ -83,6 +88,7 @@ services:
         bench use "$${SITE_NAME}"
 
         bench start
+        '
     depends_on:
       - mariadb
       - redis
