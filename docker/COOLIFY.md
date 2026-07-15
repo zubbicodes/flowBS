@@ -46,6 +46,10 @@ The `frappe` container starts as `root` only long enough to fix ownership on the
 
 The startup check validates that the existing bench can actually `import frappe`; if a previous first boot left a copied virtualenv pointing at a temporary path, it recreates the bench.
 
+On existing benches, startup also verifies that the `hrms` app is present and installed on `SITE_NAME`; this covers earlier deployments that reached ERPNext but skipped Frappe HR.
+
+On every redeploy, the existing `apps/hrms` checkout is updated from `HRMS_GIT_URL` and `HRMS_BRANCH`, then dependencies/assets/migrations are refreshed so pushed repository changes are reflected.
+
 ## Notes
 
 This compose file is suitable for a simple Coolify deployment. It still uses `bench start`, so treat it as a lightweight self-hosted setup rather than a fully tuned Frappe production stack.

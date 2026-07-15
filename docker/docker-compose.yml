@@ -75,6 +75,32 @@ services:
           cd "$${BENCH_DIR}"
           bench use "$${SITE_NAME}"
           bench --site "$${SITE_NAME}" set-config host_name "https://$${SITE_NAME}"
+          if [ ! -d "apps/$${HRMS_APP_DIR}" ]; then
+            echo "HRMS app missing from existing bench; cloning $${HRMS_GIT_URL} branch $${HRMS_BRANCH}"
+            git clone --depth 1 --branch "$${HRMS_BRANCH}" "$${HRMS_GIT_URL}" "apps/$${HRMS_APP_DIR}"
+          else
+            echo "Updating HRMS app from $${HRMS_GIT_URL} branch $${HRMS_BRANCH}"
+            git -C "apps/$${HRMS_APP_DIR}" remote set-url upstream "$${HRMS_GIT_URL}" 2>/dev/null || git -C "apps/$${HRMS_APP_DIR}" remote add upstream "$${HRMS_GIT_URL}"
+            git -C "apps/$${HRMS_APP_DIR}" fetch upstream "$${HRMS_BRANCH}" --depth 1
+            git -C "apps/$${HRMS_APP_DIR}" checkout -B "$${HRMS_BRANCH}" "upstream/$${HRMS_BRANCH}"
+          fi
+          "$${BENCH_DIR}/env/bin/python" -m pip install --quiet -e "$${BENCH_DIR}/apps/$${HRMS_APP_DIR}"
+          if [ -f "apps/$${HRMS_APP_DIR}/package.json" ]; then
+            yarn --cwd "apps/$${HRMS_APP_DIR}" install --check-files
+          fi
+          if [ -f "apps/$${HRMS_APP_DIR}/frontend/package.json" ]; then
+            yarn --cwd "apps/$${HRMS_APP_DIR}/frontend" install --check-files
+          fi
+          if [ -f "apps/$${HRMS_APP_DIR}/roster/package.json" ]; then
+            yarn --cwd "apps/$${HRMS_APP_DIR}/roster" install --check-files
+          fi
+          bench build --app hrms
+          if ! bench --site "$${SITE_NAME}" list-apps | grep -qx "hrms"; then
+            echo "Installing HRMS on existing site $${SITE_NAME}"
+            bench --site "$${SITE_NAME}" install-app hrms
+          fi
+          bench --site "$${SITE_NAME}" migrate
+          bench --site "$${SITE_NAME}" clear-cache
           bench start
         fi
 
@@ -113,6 +139,7 @@ services:
           echo "Cloning HRMS app from $${HRMS_GIT_URL} branch $${HRMS_BRANCH}"
           git clone --depth 1 --branch "$${HRMS_BRANCH}" "$${HRMS_GIT_URL}" "apps/$${HRMS_APP_DIR}"
         fi
+        grep -qxF "hrms" sites/apps.txt || echo "hrms" >> sites/apps.txt
         "$${BENCH_DIR}/env/bin/python" -m pip install --quiet -e "$${BENCH_DIR}/apps/$${HRMS_APP_DIR}"
         if [ -f "apps/$${HRMS_APP_DIR}/package.json" ]; then
           yarn --cwd "apps/$${HRMS_APP_DIR}" install --check-files
@@ -131,11 +158,15 @@ services:
             --mariadb-root-password "$${MYSQL_ROOT_PASSWORD}" \
             --admin-password "$${ADMIN_PASSWORD}" \
             --no-mariadb-socket
-
-          bench --site "$${SITE_NAME}" install-app erpnext
-          bench --site "$${SITE_NAME}" install-app hrms
         else
           echo "Site $${SITE_NAME} already exists, skipping site creation"
+        fi
+
+        if ! bench --site "$${SITE_NAME}" list-apps | grep -qx "erpnext"; then
+          bench --site "$${SITE_NAME}" install-app erpnext
+        fi
+        if ! bench --site "$${SITE_NAME}" list-apps | grep -qx "hrms"; then
+          bench --site "$${SITE_NAME}" install-app hrms
         fi
 
         bench --site "$${SITE_NAME}" set-config host_name "https://$${SITE_NAME}"
