@@ -37,7 +37,7 @@ The compose file defines these named volumes:
 - `mariadb-data` for database data
 - `frappe-bench` for the generated Frappe bench, installed apps, site config, and uploaded files
 
-If an earlier deployment is stuck in a restart loop from a broken first boot, delete the old Coolify resource volumes once before redeploying this version. Keep volumes only after the first successful boot.
+If an earlier deployment is stuck in a restart loop from a broken first boot, this startup script clears and recreates an incomplete `frappe-bench` volume automatically. If MariaDB was also partially initialized, delete the resource volumes once before redeploying.
 
 ## Notes
 
