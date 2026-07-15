@@ -31,6 +31,8 @@ HRMS_APP_DIR=hrms
 
 `SITE_NAME` should match the public domain you assign to the `frappe` service.
 
+Use only the hostname for `SITE_NAME`, for example `client1.example.com`. Do not include `https://` or `:8000`. In Coolify, the service domain can still be `https://client1.example.com:8000` so the proxy routes to container port 8000.
+
 ## Persistent storage
 
 The compose file defines these named volumes:

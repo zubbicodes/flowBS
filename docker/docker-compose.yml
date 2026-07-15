@@ -70,14 +70,16 @@ services:
         BENCH_DIR="/home/frappe/frappe-bench"
         INIT_DIR="/tmp/frappe-bench-init"
 
-        if [ -d "$${BENCH_DIR}/apps/frappe" ] && [ -f "$${BENCH_DIR}/sites/common_site_config.json" ] && "$${BENCH_DIR}/env/bin/python" -c "import frappe" >/dev/null 2>&1; then
+        if [ -d "$${BENCH_DIR}/apps/frappe" ] && [ -f "$${BENCH_DIR}/sites/common_site_config.json" ] && [ -f "$${BENCH_DIR}/sites/$${SITE_NAME}/site_config.json" ] && "$${BENCH_DIR}/env/bin/python" -c "import frappe" >/dev/null 2>&1; then
           echo "Bench already exists, starting"
           cd "$${BENCH_DIR}"
+          bench use "$${SITE_NAME}"
+          bench --site "$${SITE_NAME}" set-config host_name "https://$${SITE_NAME}"
           bench start
         fi
 
         if [ -d "$${BENCH_DIR}/apps/frappe" ]; then
-          echo "Existing bench is incomplete or has a broken Python environment; recreating"
+          echo "Existing bench is incomplete, has a broken Python environment, or is missing site $${SITE_NAME}; recreating"
         fi
 
         echo "Waiting for MariaDB and Redis"
@@ -136,6 +138,7 @@ services:
           echo "Site $${SITE_NAME} already exists, skipping site creation"
         fi
 
+        bench --site "$${SITE_NAME}" set-config host_name "https://$${SITE_NAME}"
         bench --site "$${SITE_NAME}" set-config developer_mode "$${DEVELOPER_MODE}"
         bench --site "$${SITE_NAME}" enable-scheduler
         bench --site "$${SITE_NAME}" clear-cache
