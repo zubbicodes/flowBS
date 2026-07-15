@@ -69,10 +69,14 @@ services:
         BENCH_DIR="/home/frappe/frappe-bench"
         INIT_DIR="/tmp/frappe-bench-init"
 
-        if [ -d "$${BENCH_DIR}/apps/frappe" ] && [ -f "$${BENCH_DIR}/sites/common_site_config.json" ]; then
+        if [ -d "$${BENCH_DIR}/apps/frappe" ] && [ -f "$${BENCH_DIR}/sites/common_site_config.json" ] && "$${BENCH_DIR}/env/bin/python" -c "import frappe" >/dev/null 2>&1; then
           echo "Bench already exists, starting"
           cd "$${BENCH_DIR}"
           bench start
+        fi
+
+        if [ -d "$${BENCH_DIR}/apps/frappe" ]; then
+          echo "Existing bench is incomplete or has a broken Python environment; recreating"
         fi
 
         echo "Waiting for MariaDB and Redis"
@@ -91,6 +95,7 @@ services:
         cp -R "$${INIT_DIR}/." "$${BENCH_DIR}/"
         rm -rf "$${INIT_DIR}"
         cd "$${BENCH_DIR}"
+        "$${BENCH_DIR}/env/bin/python" -m pip install --quiet -e "$${BENCH_DIR}/apps/frappe"
 
         bench set-mariadb-host mariadb
         bench set-redis-cache-host redis://redis:6379

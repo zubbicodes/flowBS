@@ -41,6 +41,8 @@ If an earlier deployment is stuck in a restart loop from a broken first boot, th
 
 The `frappe` container starts as `root` only long enough to fix ownership on the mounted `frappe-bench` volume and expose the image's `bench`/Node/Yarn binaries on PATH, then runs Bench as the `frappe` user. It uses `restart: on-failure:3` so failures do not churn forever while you are reading logs.
 
+The startup check validates that the existing bench can actually `import frappe`; if a previous first boot left a copied virtualenv pointing at a temporary path, it recreates the bench.
+
 ## Notes
 
 This compose file is suitable for a simple Coolify deployment. It still uses `bench start`, so treat it as a lightweight self-hosted setup rather than a fully tuned Frappe production stack.
