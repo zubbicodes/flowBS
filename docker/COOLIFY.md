@@ -11,9 +11,9 @@ Use this folder as a Docker Compose deployment in Coolify.
 
 The `:8000` in the Coolify domain tells Coolify to route traffic to port 8000 inside the `frappe` container. It does not publish host port 8000, so you can deploy this compose stack multiple times for different clients on the same Coolify server.
 
-The `frappe` service builds from `docker/Dockerfile`, which copies this repository into `/workspace`. Do not add a host bind mount for `/workspace` in Coolify; the app source is already inside the image.
+The `frappe` service uses the public `frappe/bench:latest` image directly. It does not build a custom image, which avoids Coolify build timeouts on slow servers.
 
-Coolify runs Compose with the repository root as the project directory, so the build context is `.` and the Dockerfile path is `docker/Dockerfile`.
+The HRMS app is fetched during first boot using `HRMS_GIT_URL` and `HRMS_BRANCH`. If your repository is private, set `HRMS_GIT_URL` to a tokenized HTTPS URL in Coolify, for example `https://x-access-token:<token>@github.com/owner/repo.git`.
 
 ## Required environment variables
 
@@ -24,6 +24,8 @@ SITE_NAME=your-hrms-domain.com
 ADMIN_PASSWORD=use-a-strong-admin-password
 MYSQL_ROOT_PASSWORD=use-a-strong-db-root-password
 DEVELOPER_MODE=0
+HRMS_GIT_URL=https://github.com/syntaxusman/erphrm.git
+HRMS_BRANCH=develop
 ```
 
 `SITE_NAME` should match the public domain you assign to the `frappe` service.
