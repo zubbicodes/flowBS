@@ -39,7 +39,7 @@ The compose file defines these named volumes:
 
 If an earlier deployment is stuck in a restart loop from a broken first boot, this startup script clears and recreates an incomplete `frappe-bench` volume automatically. If MariaDB was also partially initialized, delete the resource volumes once before redeploying.
 
-The `frappe` container starts as `root` only long enough to fix ownership on the mounted `frappe-bench` volume, then runs Bench as the `frappe` user.
+The `frappe` container starts as `root` only long enough to fix ownership on the mounted `frappe-bench` volume and expose the image's `bench`/Node/Yarn binaries on PATH, then runs Bench as the `frappe` user. It uses `restart: on-failure:3` so failures do not churn forever while you are reading logs.
 
 ## Notes
 
