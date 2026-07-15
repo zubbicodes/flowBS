@@ -18,7 +18,7 @@ services:
 
   frappe:
     build:
-      context: ..
+      context: .
       dockerfile: docker/Dockerfile
     restart: unless-stopped
     command: bash /workspace/docker/init.sh

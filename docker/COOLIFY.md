@@ -13,6 +13,8 @@ The `:8000` in the Coolify domain tells Coolify to route traffic to port 8000 in
 
 The `frappe` service builds from `docker/Dockerfile`, which copies this repository into `/workspace`. Do not add a host bind mount for `/workspace` in Coolify; the app source is already inside the image.
 
+Coolify runs Compose with the repository root as the project directory, so the build context is `.` and the Dockerfile path is `docker/Dockerfile`.
+
 ## Required environment variables
 
 Set these in Coolify before deploying:
