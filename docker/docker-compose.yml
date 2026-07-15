@@ -94,6 +94,7 @@ services:
           if [ -f "apps/$${HRMS_APP_DIR}/roster/package.json" ]; then
             yarn --cwd "apps/$${HRMS_APP_DIR}/roster" install --check-files
           fi
+          sed -i "/^erpnexthrms$/d" sites/apps.txt
           grep -qxF "hrms" sites/apps.txt || echo "hrms" >> sites/apps.txt
           bench build --app hrms
           if ! bench --site "$${SITE_NAME}" list-apps | grep -qx "hrms"; then
@@ -140,6 +141,7 @@ services:
           echo "Cloning HRMS app from $${HRMS_GIT_URL} branch $${HRMS_BRANCH}"
           git clone --depth 1 --branch "$${HRMS_BRANCH}" "$${HRMS_GIT_URL}" "apps/$${HRMS_APP_DIR}"
         fi
+        sed -i "/^erpnexthrms$/d" sites/apps.txt
         grep -qxF "hrms" sites/apps.txt || echo "hrms" >> sites/apps.txt
         "$${BENCH_DIR}/env/bin/python" -m pip install --quiet -e "$${BENCH_DIR}/apps/$${HRMS_APP_DIR}"
         if [ -f "apps/$${HRMS_APP_DIR}/package.json" ]; then

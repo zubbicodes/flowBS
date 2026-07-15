@@ -50,6 +50,8 @@ On existing benches, startup also verifies that the `hrms` app is present and in
 
 On every redeploy, the existing `apps/hrms` checkout is updated from `HRMS_GIT_URL` and `HRMS_BRANCH`, then dependencies/assets/migrations are refreshed so pushed repository changes are reflected.
 
+Startup also removes the stale legacy app entry `erpnexthrms` from `sites/apps.txt` before building, because the current Frappe HR module name is `hrms`.
+
 ## Notes
 
 This compose file is suitable for a simple Coolify deployment. It still uses `bench start`, so treat it as a lightweight self-hosted setup rather than a fully tuned Frappe production stack.
