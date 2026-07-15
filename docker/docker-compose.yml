@@ -66,6 +66,7 @@ services:
         DEVELOPER_MODE="$${DEVELOPER_MODE:-0}"
         HRMS_GIT_URL="$${HRMS_GIT_URL:-https://github.com/syntaxusman/erphrm.git}"
         HRMS_BRANCH="$${HRMS_BRANCH:-develop}"
+        HRMS_APP_DIR="$${HRMS_APP_DIR:-hrms}"
         BENCH_DIR="/home/frappe/frappe-bench"
         INIT_DIR="/tmp/frappe-bench-init"
 
@@ -106,7 +107,21 @@ services:
         sed -i "/watch/d" ./Procfile
 
         bench get-app erpnext
-        bench get-app "$${HRMS_GIT_URL}" --branch "$${HRMS_BRANCH}"
+        if [ ! -d "apps/$${HRMS_APP_DIR}" ]; then
+          echo "Cloning HRMS app from $${HRMS_GIT_URL} branch $${HRMS_BRANCH}"
+          git clone --depth 1 --branch "$${HRMS_BRANCH}" "$${HRMS_GIT_URL}" "apps/$${HRMS_APP_DIR}"
+        fi
+        "$${BENCH_DIR}/env/bin/python" -m pip install --quiet -e "$${BENCH_DIR}/apps/$${HRMS_APP_DIR}"
+        if [ -f "apps/$${HRMS_APP_DIR}/package.json" ]; then
+          yarn --cwd "apps/$${HRMS_APP_DIR}" install --check-files
+        fi
+        if [ -f "apps/$${HRMS_APP_DIR}/frontend/package.json" ]; then
+          yarn --cwd "apps/$${HRMS_APP_DIR}/frontend" install --check-files
+        fi
+        if [ -f "apps/$${HRMS_APP_DIR}/roster/package.json" ]; then
+          yarn --cwd "apps/$${HRMS_APP_DIR}/roster" install --check-files
+        fi
+        bench build --app hrms
 
         if [ ! -f "sites/$${SITE_NAME}/site_config.json" ]; then
           bench new-site "$${SITE_NAME}" \
@@ -141,6 +156,7 @@ services:
       - DEVELOPER_MODE=${DEVELOPER_MODE:-0}
       - HRMS_GIT_URL=${HRMS_GIT_URL:-https://github.com/syntaxusman/erphrm.git}
       - HRMS_BRANCH=${HRMS_BRANCH:-develop}
+      - HRMS_APP_DIR=${HRMS_APP_DIR:-hrms}
     working_dir: /home/frappe
     volumes:
       - frappe-bench:/home/frappe/frappe-bench

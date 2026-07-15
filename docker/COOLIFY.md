@@ -13,7 +13,7 @@ The `:8000` in the Coolify domain tells Coolify to route traffic to port 8000 in
 
 The `frappe` service uses the public `frappe/bench:latest` image directly. It does not build a custom image, which avoids Coolify build timeouts on slow servers.
 
-The HRMS app is fetched during first boot using `HRMS_GIT_URL` and `HRMS_BRANCH`. If your repository is private, set `HRMS_GIT_URL` to a tokenized HTTPS URL in Coolify, for example `https://x-access-token:<token>@github.com/owner/repo.git`.
+The HRMS app is fetched during first boot using `HRMS_GIT_URL`, `HRMS_BRANCH`, and `HRMS_APP_DIR`. It is cloned into `apps/hrms` by default so Frappe can install the `hrms` app even though the GitHub repository is named `erphrm`.
 
 ## Required environment variables
 
@@ -26,6 +26,7 @@ MYSQL_ROOT_PASSWORD=use-a-strong-db-root-password
 DEVELOPER_MODE=0
 HRMS_GIT_URL=https://github.com/syntaxusman/erphrm.git
 HRMS_BRANCH=develop
+HRMS_APP_DIR=hrms
 ```
 
 `SITE_NAME` should match the public domain you assign to the `frappe` service.
