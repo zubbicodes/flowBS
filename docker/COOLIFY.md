@@ -29,7 +29,9 @@ DEVELOPER_MODE=0
 The compose file defines these named volumes:
 
 - `mariadb-data` for database data
-- `frappe-sites` for Frappe site files and private/public uploads
+- `frappe-bench` for the generated Frappe bench, installed apps, site config, and uploaded files
+
+If an earlier deployment is stuck in a restart loop from a broken first boot, delete the old Coolify resource volumes once before redeploying this version. Keep volumes only after the first successful boot.
 
 ## Notes
 

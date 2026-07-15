@@ -5,22 +5,26 @@ SITE_NAME="${SITE_NAME:-hrms.localhost}"
 ADMIN_PASSWORD="${ADMIN_PASSWORD:-admin}"
 MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-123}"
 DEVELOPER_MODE="${DEVELOPER_MODE:-0}"
+BENCH_DIR="/home/frappe/frappe-bench"
 
-if [ -d "/home/frappe/frappe-bench/apps/frappe" ]; then
+if [ -d "${BENCH_DIR}/apps/frappe" ]; then
     echo "Bench already exists, skipping init"
-    cd frappe-bench
+    cd "${BENCH_DIR}"
     bench start
-else
-    echo "Creating new bench..."
 fi
 
 export PATH="${NVM_DIR}/versions/node/v${NODE_VERSION_DEVELOP}/bin/:${PATH}"
 git config --global --add safe.directory /workspace
 git config --global --add safe.directory /workspace/.git
 
+echo "Creating new bench..."
+if [ -d "${BENCH_DIR}" ]; then
+    find "${BENCH_DIR}" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+fi
+
 bench init --skip-redis-config-generation frappe-bench
 
-cd frappe-bench
+cd "${BENCH_DIR}"
 
 # Use containers instead of localhost
 bench set-mariadb-host mariadb
