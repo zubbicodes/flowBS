@@ -4450,7 +4450,7 @@ msgstr "Djelimični Trošak"
 
 #. Label of a Desktop Icon
 #: frontend/src/components/BaseLayout.vue:9 hrms/desktop_icon/frappe_hr.json
-msgid "Frappe HR"
+msgid "FlowHR"
 msgstr "Osoblje"
 
 #. Label of the from_amount (Currency) field in DocType 'Taxable Salary Slab'
@@ -5306,7 +5306,7 @@ msgstr "Instaliraj"
 
 #: frontend/src/components/InstallPrompt.vue:5
 #: frontend/src/components/InstallPrompt.vue:28
-msgid "Install Frappe HR"
+msgid "Install FlowHR"
 msgstr "Instaliraj Osoblje"
 
 #: hrms/hr/doctype/leave_application/leave_application.py:482
@@ -6503,7 +6503,7 @@ msgid "Login Failed"
 msgstr "Prijava nije uspjela"
 
 #: frontend/src/views/Login.vue:38
-msgid "Login to Frappe HR"
+msgid "Login to FlowHR"
 msgstr "Prijava na Osoblje"
 
 #: frontend/src/components/CheckInPanel.vue:129
@@ -11470,7 +11470,7 @@ msgid "Violet"
 msgstr "Ljubičasta"
 
 #: hrms/patches/v15_0/notify_about_loan_app_separation.py:16
-msgid "WARNING: Loan Management module has been separated from ERPNext."
+msgid "WARNING: Loan Management module has been separated from FlowERP."
 msgstr "UPOZORENJE: Modul Upravljanja Kreditom je odvojen od Sistema."
 
 #: hrms/hr/doctype/leave_application/leave_application.py:465

@@ -33,9 +33,9 @@
 
 			<div v-else class="flex h-screen w-screen flex-col justify-center bg-white">
 				<div class="flex flex-col mx-auto gap-3 items-center">
-					<FrappeHRLogo class="h-8 w-8" />
+					<FlowLogo class="h-8 w-8" />
 					<div class="text-3xl font-semibold text-gray-900 text-center">
-						{{ __("Login to Frappe HR") }}
+						{{ __("Login to FlowHR") }}
 					</div>
 				</div>
 
@@ -128,7 +128,7 @@ import { IonPage, IonContent } from "@ionic/vue"
 import { inject, reactive, ref } from "vue"
 import { Input, Button, ErrorMessage, Dialog, createResource } from "frappe-ui"
 
-import FrappeHRLogo from "@/components/icons/FrappeHRLogo.vue"
+import FlowLogo from "@/components/icons/FlowLogo.vue"
 
 const email = ref(null)
 const password = ref(null)

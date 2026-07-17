@@ -13,6 +13,8 @@ __pycache__/
 # build/
 .vscode
 .vs
+.env
+docker/.env
 node_modules
 *debug.log
 hrms/docs/current

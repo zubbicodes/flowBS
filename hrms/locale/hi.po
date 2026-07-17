@@ -4422,7 +4422,7 @@ msgstr "आंशिक लागत"
 
 #. Label of a Desktop Icon
 #: frontend/src/components/BaseLayout.vue:9 hrms/desktop_icon/frappe_hr.json
-msgid "Frappe HR"
+msgid "FlowHR"
 msgstr ""
 
 #. Label of the from_amount (Currency) field in DocType 'Taxable Salary Slab'
@@ -5278,7 +5278,7 @@ msgstr "स्थापित करना"
 
 #: frontend/src/components/InstallPrompt.vue:5
 #: frontend/src/components/InstallPrompt.vue:28
-msgid "Install Frappe HR"
+msgid "Install FlowHR"
 msgstr ""
 
 #: hrms/hr/doctype/leave_application/leave_application.py:482
@@ -6475,7 +6475,7 @@ msgid "Login Failed"
 msgstr ""
 
 #: frontend/src/views/Login.vue:38
-msgid "Login to Frappe HR"
+msgid "Login to FlowHR"
 msgstr ""
 
 #: frontend/src/components/CheckInPanel.vue:129
@@ -11442,7 +11442,7 @@ msgid "Violet"
 msgstr ""
 
 #: hrms/patches/v15_0/notify_about_loan_app_separation.py:16
-msgid "WARNING: Loan Management module has been separated from ERPNext."
+msgid "WARNING: Loan Management module has been separated from FlowERP."
 msgstr ""
 
 #: hrms/hr/doctype/leave_application/leave_application.py:465

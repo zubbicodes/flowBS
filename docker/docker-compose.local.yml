@@ -1,5 +1,16 @@
 services:
   frappe:
+    environment:
+      HRMS_MOUNT_DIR: /workspace/hrms
+      RAVEN_MOUNT_DIR: /workspace/hrms/raven
+    volumes:
+      - ..:/workspace/hrms
+      - /workspace/hrms/node_modules
+      - /workspace/hrms/frontend/node_modules
+      - /workspace/hrms/roster/node_modules
+      - /workspace/hrms/raven/node_modules
+      - /workspace/hrms/raven/frontend/node_modules
+      - /workspace/hrms/raven/apps/mobile/node_modules
     ports:
       - "${FRAPPE_HTTP_PORT:-8000}:8000"
       - "${FRAPPE_SOCKETIO_PORT:-9000}:9000"

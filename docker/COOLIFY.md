@@ -1,4 +1,4 @@
-# Coolify Deployment
+# FLOW Coolify Deployment
 
 Use this folder as a Docker Compose deployment in Coolify.
 
@@ -7,7 +7,7 @@ Use this folder as a Docker Compose deployment in Coolify.
 - Resource type: Docker Compose
 - Compose file: `docker/docker-compose.yml`
 - Public service: `frappe`
-- Domain: `https://your-hrms-domain.com:8000`
+- Domain: `https://flow.example.com:8000`
 
 The `:8000` in the Coolify domain tells Coolify to route traffic to port 8000 inside the `frappe` container. It does not publish host port 8000, so you can deploy this compose stack multiple times for different clients on the same Coolify server.
 
@@ -21,15 +21,27 @@ Set these in Coolify before deploying:
 
 ```env
 SITE_NAME=your-hrms-domain.com
+FLOW_SITE_URL=https://your-hrms-domain.com
+FLOW_SUPPORT_EMAIL=support@yourcompany.com
 ADMIN_PASSWORD=use-a-strong-admin-password
 MYSQL_ROOT_PASSWORD=use-a-strong-db-root-password
 DEVELOPER_MODE=0
-HRMS_GIT_URL=https://github.com/syntaxusman/erphrm.git
+HRMS_GIT_URL=https://github.com/zubbicodes/erphrm.git
 HRMS_BRANCH=develop
 HRMS_APP_DIR=hrms
+RAVEN_GIT_URL=https://github.com/syntaxusman/raven.git
+RAVEN_BRANCH=develop
+RAVEN_APP_DIR=raven
+RAVEN_BUILD_ASSETS=1
+FAST_START=0
 ```
 
 `SITE_NAME` should match the public domain you assign to the `frappe` service.
+
+`FLOW_SITE_URL` is the complete public URL used by FLOW, while
+`FLOW_SUPPORT_EMAIL` is the public support address shown by FlowHR and
+FlowConnect. Keep deployment credentials and environment-specific values in
+Coolify or an untracked `.env` file; do not commit them.
 
 Use only the hostname for `SITE_NAME`, for example `client1.example.com`. Do not include `https://` or `:8000`. In Coolify, the service domain can still be `https://client1.example.com:8000` so the proxy routes to container port 8000.
 

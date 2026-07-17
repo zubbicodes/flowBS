@@ -4422,7 +4422,7 @@ msgstr "crwdns107314:0crwdne107314:0"
 
 #. Label of a Desktop Icon
 #: frontend/src/components/BaseLayout.vue:9 hrms/desktop_icon/frappe_hr.json
-msgid "Frappe HR"
+msgid "FlowHR"
 msgstr "crwdns151228:0crwdne151228:0"
 
 #. Label of the from_amount (Currency) field in DocType 'Taxable Salary Slab'
@@ -5278,7 +5278,7 @@ msgstr "crwdns151242:0crwdne151242:0"
 
 #: frontend/src/components/InstallPrompt.vue:5
 #: frontend/src/components/InstallPrompt.vue:28
-msgid "Install Frappe HR"
+msgid "Install FlowHR"
 msgstr "crwdns151244:0crwdne151244:0"
 
 #: hrms/hr/doctype/leave_application/leave_application.py:482
@@ -6475,7 +6475,7 @@ msgid "Login Failed"
 msgstr "crwdns151260:0crwdne151260:0"
 
 #: frontend/src/views/Login.vue:38
-msgid "Login to Frappe HR"
+msgid "Login to FlowHR"
 msgstr "crwdns151262:0crwdne151262:0"
 
 #: frontend/src/components/CheckInPanel.vue:129
@@ -11442,7 +11442,7 @@ msgid "Violet"
 msgstr "crwdns148564:0crwdne148564:0"
 
 #: hrms/patches/v15_0/notify_about_loan_app_separation.py:16
-msgid "WARNING: Loan Management module has been separated from ERPNext."
+msgid "WARNING: Loan Management module has been separated from FlowERP."
 msgstr "crwdns110576:0crwdne110576:0"
 
 #: hrms/hr/doctype/leave_application/leave_application.py:465

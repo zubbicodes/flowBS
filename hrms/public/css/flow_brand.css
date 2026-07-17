@@ -1,0 +1,47 @@
+:root {
+  --flow-navy: #0f172a;
+  --flow-indigo: #4f46e5;
+  --flow-cyan: #06b6d4;
+  --flow-surface: #f8fafc;
+  --primary: var(--flow-indigo);
+  --primary-color: var(--flow-indigo);
+}
+
+.flow-brand {
+  align-items: center;
+  color: var(--flow-navy);
+  display: inline-flex;
+  font-weight: 700;
+  gap: 0.55rem;
+  letter-spacing: -0.02em;
+}
+
+.flow-brand img {
+  border-radius: 0.6rem;
+  height: 2rem;
+  width: 2rem;
+}
+
+.navbar-brand .flow-brand img,
+.web-navbar .flow-brand img {
+  height: 1.75rem;
+  width: 1.75rem;
+}
+
+.btn-primary,
+.btn-primary-dark,
+.btn-primary-light {
+  --btn-bg: var(--flow-indigo);
+  --btn-color: #fff;
+}
+
+.indicator-pill.blue,
+.indicator-pill.blue::before {
+  --indicator-color: var(--flow-indigo);
+}
+
+.flow-gradient-text {
+  background: linear-gradient(120deg, var(--flow-indigo), var(--flow-cyan));
+  background-clip: text;
+  color: transparent;
+}

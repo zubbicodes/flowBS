@@ -1,16 +1,16 @@
 {
   "private": true,
   "name": "hrms",
-  "description": "Open Source HR & Payroll System powered by the Frappe Framework",
+  "description": "FlowHR - HR and Payroll for the FLOW business suite",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/frappe/hrms.git"
+    "url": "git+https://github.com/zubbicodes/erphrm.git"
   },
-  "homepage": "https://frappe.io/hr",
-  "author": "Frappe Technologies Pvt. Ltd.",
+  "homepage": "https://github.com/zubbicodes/erphrm",
+  "author": "FLOW",
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/frappe/hrms/issues"
+    "url": "https://github.com/zubbicodes/erphrm/issues"
   },
   "aworkspaces": ["frontend", "roster", "frappe-ui"],
   "scripts": {

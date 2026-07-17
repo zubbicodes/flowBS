@@ -1,9 +1,9 @@
 [project]
 name = "hrms"
 authors = [
-    { name = "Frappe Technologies Pvt Ltd", email = "developers@frappe.io" },
+    { name = "FLOW", email = "support@flow.local" },
 ]
-description = "Open Source HR & Payroll Software"
+description = "FlowHR - HR and Payroll for the FLOW business suite"
 requires-python = ">=3.10"
 readme = "README.md"
 dynamic = ["version"]
@@ -63,10 +63,10 @@ section-order = [
 
 
 [project.urls]
-Homepage = "https://frappe.io/hr"
-Repository = "https://github.com/frappe/hrms.git"
-Documentation = "https://docs.frappe.io/hr"
-"Bug Reports" = "https://github.com/frappe/hrms/issues"
+Homepage = "https://github.com/zubbicodes/erphrm"
+Repository = "https://github.com/zubbicodes/erphrm.git"
+Documentation = "https://github.com/zubbicodes/erphrm#readme"
+"Bug Reports" = "https://github.com/zubbicodes/erphrm/issues"
 
 
 [tool.bench.frappe-dependencies]

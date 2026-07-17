@@ -4450,8 +4450,8 @@ msgstr "Дополнительная стоимость"
 
 #. Label of a Desktop Icon
 #: frontend/src/components/BaseLayout.vue:9 hrms/desktop_icon/frappe_hr.json
-msgid "Frappe HR"
-msgstr "Frappe HR"
+msgid "FlowHR"
+msgstr "FlowHR"
 
 #. Label of the from_amount (Currency) field in DocType 'Taxable Salary Slab'
 #: hrms/payroll/doctype/taxable_salary_slab/taxable_salary_slab.json
@@ -5306,8 +5306,8 @@ msgstr "Установить"
 
 #: frontend/src/components/InstallPrompt.vue:5
 #: frontend/src/components/InstallPrompt.vue:28
-msgid "Install Frappe HR"
-msgstr "Установить Frappe HR"
+msgid "Install FlowHR"
+msgstr "Установить FlowHR"
 
 #: hrms/hr/doctype/leave_application/leave_application.py:482
 msgid "Insufficient Balance"
@@ -6503,8 +6503,8 @@ msgid "Login Failed"
 msgstr "Ошибка входа"
 
 #: frontend/src/views/Login.vue:38
-msgid "Login to Frappe HR"
-msgstr "Войти в Frappe HR"
+msgid "Login to FlowHR"
+msgstr "Войти в FlowHR"
 
 #: frontend/src/components/CheckInPanel.vue:129
 msgid "Longitude: {0}°"
@@ -11470,8 +11470,8 @@ msgid "Violet"
 msgstr "Фиолетовый"
 
 #: hrms/patches/v15_0/notify_about_loan_app_separation.py:16
-msgid "WARNING: Loan Management module has been separated from ERPNext."
-msgstr "ВНИМАНИЕ: Модуль управления кредитами отделен от ERPNext."
+msgid "WARNING: Loan Management module has been separated from FlowERP."
+msgstr "ВНИМАНИЕ: Модуль управления кредитами отделен от FlowERP."
 
 #: hrms/hr/doctype/leave_application/leave_application.py:465
 msgid "Warning: Insufficient leave balance for Leave Type {0} in this allocation."

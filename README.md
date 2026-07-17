@@ -1,11 +1,9 @@
 <div align="center">
-	<a href="https://frappe.io/hr">
-		<img src=".github/frappe-hr-logo.png" height="80px" width="80px" alt="Frappe HR Logo">
+	<a href="https://github.com/zubbicodes/erphrm">
+		<img src="hrms/public/images/flow-logo.svg" height="80px" width="80px" alt="FLOW Logo">
 	</a>
-	<h2>Frappe HR</h2>
-	<p align="center">
-		<p>Open Source, modern, and easy-to-use HR and Payroll Software</p>
-	</p>
+	<h2>FLOW Business Suite</h2>
+	<p align="center">FlowERP · FlowHR · FlowConnect · FlowRoster</p>
 
 [![CI](https://github.com/frappe/hrms/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/frappe/hrms/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/frappe/hrms/branch/develop/graph/badge.svg?token=0TwvyUg3I5)](https://codecov.io/gh/frappe/hrms)
@@ -23,9 +21,9 @@
 	<a href="https://docs.frappe.io/hr/introduction">Documentation</a>
 </div>
 
-## Frappe HR
+## FlowHR
 
-Frappe HR has everything you need to drive excellence within the company. It's a complete HRMS solution with over 13 different modules right from Employee Management, Onboarding, Leaves, to Payroll, Taxation, and more!
+FlowHR is the people, payroll, attendance, recruitment, and performance application in the FLOW business suite.
 
 ## Motivation
 When Frappe team started growing in terms of size, we needed an open-source HR and Payroll software. We didn't find any "true" open-source HR software out there and so decided to build one ourselves.
@@ -75,6 +73,21 @@ It takes care of installation, setup, upgrades, monitoring, maintenance and supp
 
 
 ## Development setup
+
+### Test the complete FLOW suite locally
+
+Copy `docker/.env.example` to `docker/.env`, fill in the site, support,
+credential, and repository values, then run from the repository root:
+
+```bash
+docker compose -p flow-local --env-file docker/.env -f docker/docker-compose.yml -f docker/docker-compose.local.yml up -d
+```
+
+Open `http://localhost:8000`. The first startup initializes FlowERP, FlowHR,
+FlowConnect, and their assets, so it takes longer than later starts. Follow it
+with the same command plus `logs -f frappe`, and stop it with the same command
+plus `down`.
+
 ### Docker
 You need Docker, docker-compose and git setup on your machine. Refer [Docker documentation](https://docs.docker.com/). After that, run the following commands:
 ```

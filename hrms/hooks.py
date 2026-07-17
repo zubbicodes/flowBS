@@ -1,19 +1,22 @@
+import os
+
+
 app_name = "hrms"
-app_title = "Frappe HR"
-app_publisher = "Frappe Technologies Pvt. Ltd."
+app_title = "FlowHR"
+app_publisher = "FLOW"
 app_description = "Modern HR and Payroll Software"
-app_email = "contact@frappe.io"
+app_email = os.environ.get("FLOW_SUPPORT_EMAIL", "support@flow.local")
 app_license = "GNU General Public License (v3)"
 required_apps = ["frappe/erpnext"]
-source_link = "http://github.com/frappe/hrms"
-app_logo_url = "/assets/hrms/images/frappe-hr-logo.svg"
+source_link = os.environ.get("HRMS_GIT_URL", "https://github.com/zubbicodes/erphrm.git").removesuffix(".git")
+app_logo_url = "/assets/hrms/images/flow-logo.svg"
 app_home = "/desk/hr-setup"
 
 add_to_apps_screen = [
 	{
 		"name": "hrms",
-		"logo": "/assets/hrms/images/frappe-hr-logo.svg",
-		"title": "Frappe HR",
+		"logo": "/assets/hrms/images/flow-logo.svg",
+		"title": "FlowHR",
 		"route": app_home,
 		"has_permission": "hrms.hr.utils.check_app_permission",
 		"sequence_id": 2,
@@ -27,14 +30,24 @@ add_to_apps_screen = [
 # app_include_css = "/assets/hrms/css/hrms.css"
 app_include_js = [
 	"hrms.bundle.js",
+	"/assets/hrms/js/flow_brand.js",
 ]
-app_include_css = "hrms.bundle.css"
+app_include_css = ["hrms.bundle.css", "/assets/hrms/css/flow_brand.css"]
 
 # website
 
 # include js, css files in header of web template
-# web_include_css = "/assets/hrms/css/hrms.css"
-# web_include_js = "/assets/hrms/js/hrms.js"
+web_include_css = "/assets/hrms/css/flow_brand.css"
+web_include_js = "/assets/hrms/js/flow_brand.js"
+brand_html = '<span class="flow-brand"><img src="/assets/hrms/images/flow-logo.svg" alt="FLOW">FLOW</span>'
+website_context = {"favicon": "/assets/hrms/images/flow-logo.svg"}
+update_website_context = "hrms.flow_brand.update_website_context"
+default_mail_footer = """
+<div style="color:#64748b;font-size:12px;margin-top:24px">
+  Sent securely via <strong style="color:#0f172a">FLOW</strong>
+</div>
+"""
+extend_bootinfo = "hrms.flow_brand.extend_bootinfo"
 
 # include custom scss in every website theme (without file extension ".scss")
 # website_theme_scss = "hrms/public/scss/website"
@@ -99,7 +112,10 @@ jinja = {
 
 # before_install = "hrms.install.before_install"
 after_install = "hrms.install.after_install"
-after_migrate = "hrms.setup.update_select_perm_after_install"
+after_migrate = [
+	"hrms.setup.update_select_perm_after_install",
+	"hrms.flow_brand.apply_site_branding",
+]
 
 setup_wizard_complete = "hrms.subscription_utils.update_erpnext_access"
 

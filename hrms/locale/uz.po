@@ -4450,8 +4450,8 @@ msgstr "Kasrli narx"
 
 #. Label of a Desktop Icon
 #: frontend/src/components/BaseLayout.vue:9 hrms/desktop_icon/frappe_hr.json
-msgid "Frappe HR"
-msgstr "Frappe HR"
+msgid "FlowHR"
+msgstr "FlowHR"
 
 #. Label of the from_amount (Currency) field in DocType 'Taxable Salary Slab'
 #: hrms/payroll/doctype/taxable_salary_slab/taxable_salary_slab.json
@@ -5306,8 +5306,8 @@ msgstr "O'rnatish"
 
 #: frontend/src/components/InstallPrompt.vue:5
 #: frontend/src/components/InstallPrompt.vue:28
-msgid "Install Frappe HR"
-msgstr "Frappe HR ni o'rnating"
+msgid "Install FlowHR"
+msgstr "FlowHR ni o'rnating"
 
 #: hrms/hr/doctype/leave_application/leave_application.py:482
 msgid "Insufficient Balance"
@@ -6503,8 +6503,8 @@ msgid "Login Failed"
 msgstr "Tizimga kirishda xatolik yuz berdi"
 
 #: frontend/src/views/Login.vue:38
-msgid "Login to Frappe HR"
-msgstr "Frappe HRga kirish"
+msgid "Login to FlowHR"
+msgstr "FlowHRga kirish"
 
 #: frontend/src/components/CheckInPanel.vue:129
 msgid "Longitude: {0}°"
@@ -11470,8 +11470,8 @@ msgid "Violet"
 msgstr "Binafsha rang"
 
 #: hrms/patches/v15_0/notify_about_loan_app_separation.py:16
-msgid "WARNING: Loan Management module has been separated from ERPNext."
-msgstr "OGOHLANTIRISH: Kreditlarni boshqarish moduli ERPNext’dan ajratildi."
+msgid "WARNING: Loan Management module has been separated from FlowERP."
+msgstr "OGOHLANTIRISH: Kreditlarni boshqarish moduli FlowERP’dan ajratildi."
 
 #: hrms/hr/doctype/leave_application/leave_application.py:465
 msgid "Warning: Insufficient leave balance for Leave Type {0} in this allocation."

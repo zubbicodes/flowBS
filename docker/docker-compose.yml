@@ -37,6 +37,19 @@ services:
         set -e
         mkdir -p /home/frappe/frappe-bench
         chown -R frappe:frappe /home/frappe/frappe-bench
+        if [ -d /workspace/hrms ]; then
+          for dependency_dir in \
+            /workspace/hrms/node_modules \
+            /workspace/hrms/frontend/node_modules \
+            /workspace/hrms/roster/node_modules \
+            /workspace/hrms/raven/node_modules \
+            /workspace/hrms/raven/frontend/node_modules \
+            /workspace/hrms/raven/apps/mobile/node_modules; do
+            if [ -d "$${dependency_dir}" ]; then
+              chown -R frappe:frappe "$${dependency_dir}"
+            fi
+          done
+        fi
         ln -sf /home/frappe/.local/bin/bench /usr/local/bin/bench
         NODE_BIN="$$(find /home/frappe/.nvm/versions/node -maxdepth 2 -type f -name yarn -printf "%h\n" 2>/dev/null | sort -V | tail -n 1)"
         if [ -n "$${NODE_BIN}" ]; then
@@ -61,12 +74,15 @@ services:
         echo "yarn: $$(command -v yarn || true)"
 
         SITE_NAME="$${SITE_NAME:-hrms.localhost}"
+        FLOW_SITE_URL="$${FLOW_SITE_URL:-https://$${SITE_NAME}}"
+        FLOW_SUPPORT_EMAIL="$${FLOW_SUPPORT_EMAIL:-support@flow.local}"
         ADMIN_PASSWORD="$${ADMIN_PASSWORD:-admin}"
         MYSQL_ROOT_PASSWORD="$${MYSQL_ROOT_PASSWORD:-123}"
         DEVELOPER_MODE="$${DEVELOPER_MODE:-0}"
-        HRMS_GIT_URL="$${HRMS_GIT_URL:-https://github.com/syntaxusman/erphrm.git}"
+        HRMS_GIT_URL="$${HRMS_GIT_URL:-https://github.com/zubbicodes/erphrm.git}"
         HRMS_BRANCH="$${HRMS_BRANCH:-develop}"
         HRMS_APP_DIR="$${HRMS_APP_DIR:-hrms}"
+        HRMS_MOUNT_DIR="$${HRMS_MOUNT_DIR:-}"
         RAVEN_GIT_URL="$${RAVEN_GIT_URL:-https://github.com/syntaxusman/raven.git}"
         RAVEN_BRANCH="$${RAVEN_BRANCH:-develop}"
         RAVEN_APP_DIR="$${RAVEN_APP_DIR:-raven}"
@@ -135,7 +151,7 @@ services:
             }
             trap restore_raven_package_files EXIT
 
-            node -e "const fs = require('fs'); const p = JSON.parse(fs.readFileSync('package.json', 'utf8')); if (Array.isArray(p.workspaces)) p.workspaces = p.workspaces.filter((workspace) => workspace !== 'apps/*'); fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');"
+            node -e "const fs = require(\"fs\"); const p = JSON.parse(fs.readFileSync(\"package.json\", \"utf8\")); if (Array.isArray(p.workspaces)) p.workspaces = p.workspaces.filter((workspace) => workspace !== \"apps/*\"); fs.writeFileSync(\"package.json\", JSON.stringify(p, null, 2) + \"\\n\");"
             yarn install --check-files --ignore-scripts --network-timeout 600000
             yarn build
           )
@@ -147,16 +163,10 @@ services:
           cd "$${BENCH_DIR}"
           printf "frappe\nerpnext\nhrms\n" > sites/apps.txt
           bench use "$${SITE_NAME}"
-          bench --site "$${SITE_NAME}" set-config host_name "https://$${SITE_NAME}"
-          if [ ! -d "apps/$${HRMS_APP_DIR}" ]; then
-            echo "HRMS app missing from existing bench; cloning $${HRMS_GIT_URL} branch $${HRMS_BRANCH}"
-            git clone --depth 1 --branch "$${HRMS_BRANCH}" "$${HRMS_GIT_URL}" "apps/$${HRMS_APP_DIR}"
-          else
-            echo "Updating HRMS app from $${HRMS_GIT_URL} branch $${HRMS_BRANCH}"
-            git -C "apps/$${HRMS_APP_DIR}" remote set-url upstream "$${HRMS_GIT_URL}" 2>/dev/null || git -C "apps/$${HRMS_APP_DIR}" remote add upstream "$${HRMS_GIT_URL}"
-            git -C "apps/$${HRMS_APP_DIR}" fetch upstream "$${HRMS_BRANCH}" --depth 1
-            git -C "apps/$${HRMS_APP_DIR}" checkout -B "$${HRMS_BRANCH}" "upstream/$${HRMS_BRANCH}"
-          fi
+          bench --site "$${SITE_NAME}" set-config host_name "$${FLOW_SITE_URL}"
+          bench --site "$${SITE_NAME}" set-config flow_site_url "$${FLOW_SITE_URL}"
+          bench --site "$${SITE_NAME}" set-config flow_support_email "$${FLOW_SUPPORT_EMAIL}"
+          ensure_app_checkout "$${HRMS_APP_DIR}" "$${HRMS_GIT_URL}" "$${HRMS_BRANCH}" "$${HRMS_MOUNT_DIR}"
           ensure_app_checkout "$${RAVEN_APP_DIR}" "$${RAVEN_GIT_URL}" "$${RAVEN_BRANCH}" "$${RAVEN_MOUNT_DIR}"
           printf "frappe\nerpnext\nhrms\nraven\n" > sites/apps.txt
           "$${BENCH_DIR}/env/bin/python" -m pip install --quiet -e "$${BENCH_DIR}/apps/$${HRMS_APP_DIR}"
@@ -224,10 +234,7 @@ services:
         sed -i "/watch/d" ./Procfile
 
         bench get-app erpnext
-        if [ ! -d "apps/$${HRMS_APP_DIR}" ]; then
-          echo "Cloning HRMS app from $${HRMS_GIT_URL} branch $${HRMS_BRANCH}"
-          git clone --depth 1 --branch "$${HRMS_BRANCH}" "$${HRMS_GIT_URL}" "apps/$${HRMS_APP_DIR}"
-        fi
+        ensure_app_checkout "$${HRMS_APP_DIR}" "$${HRMS_GIT_URL}" "$${HRMS_BRANCH}" "$${HRMS_MOUNT_DIR}"
         ensure_app_checkout "$${RAVEN_APP_DIR}" "$${RAVEN_GIT_URL}" "$${RAVEN_BRANCH}" "$${RAVEN_MOUNT_DIR}"
         printf "frappe\nerpnext\nhrms\nraven\n" > sites/apps.txt
         "$${BENCH_DIR}/env/bin/python" -m pip install --quiet -e "$${BENCH_DIR}/apps/$${HRMS_APP_DIR}"
@@ -268,9 +275,12 @@ services:
           bench --site "$${SITE_NAME}" install-app raven
         fi
 
-        bench --site "$${SITE_NAME}" set-config host_name "https://$${SITE_NAME}"
+        bench --site "$${SITE_NAME}" set-config host_name "$${FLOW_SITE_URL}"
+        bench --site "$${SITE_NAME}" set-config flow_site_url "$${FLOW_SITE_URL}"
+        bench --site "$${SITE_NAME}" set-config flow_support_email "$${FLOW_SUPPORT_EMAIL}"
         bench --site "$${SITE_NAME}" set-config developer_mode "$${DEVELOPER_MODE}"
         bench --site "$${SITE_NAME}" enable-scheduler
+        bench --site "$${SITE_NAME}" migrate
         bench --site "$${SITE_NAME}" clear-cache
         bench use "$${SITE_NAME}"
 
@@ -284,12 +294,15 @@ services:
     environment:
       - SHELL=/bin/bash
       - SITE_NAME=${SITE_NAME:?Set your public Frappe site/domain, for example hrms.example.com}
+      - FLOW_SITE_URL=${FLOW_SITE_URL:?Set the public FLOW URL, for example https://flow.example.com}
+      - FLOW_SUPPORT_EMAIL=${FLOW_SUPPORT_EMAIL:?Set the public FLOW support email}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:?Set a strong Frappe Administrator password in Coolify}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:?Set a strong MariaDB root password in Coolify}
       - DEVELOPER_MODE=${DEVELOPER_MODE:-0}
-      - HRMS_GIT_URL=${HRMS_GIT_URL:-https://github.com/syntaxusman/erphrm.git}
+      - HRMS_GIT_URL=${HRMS_GIT_URL:-https://github.com/zubbicodes/erphrm.git}
       - HRMS_BRANCH=${HRMS_BRANCH:-develop}
       - HRMS_APP_DIR=${HRMS_APP_DIR:-hrms}
+      - HRMS_MOUNT_DIR=${HRMS_MOUNT_DIR:-}
       - RAVEN_GIT_URL=${RAVEN_GIT_URL:-https://github.com/syntaxusman/raven.git}
       - RAVEN_BRANCH=${RAVEN_BRANCH:-develop}
       - RAVEN_APP_DIR=${RAVEN_APP_DIR:-raven}

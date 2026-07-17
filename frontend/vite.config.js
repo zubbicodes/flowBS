@@ -1,7 +1,6 @@
 import { defineConfig } from "vite"
 import vue from "@vitejs/plugin-vue"
 import { VitePWA } from "vite-plugin-pwa"
-import frappeui from "frappe-ui/vite"
 
 import path from "path"
 import fs from "fs"
@@ -14,7 +13,6 @@ export default defineConfig({
 	},
 	plugins: [
 		vue(),
-		frappeui(),
 		VitePWA({
 			registerType: "autoUpdate",
 			strategies: "injectManifest",
@@ -24,8 +22,8 @@ export default defineConfig({
 			},
 			manifest: {
 				display: "standalone",
-				name: "Frappe HR",
-				short_name: "Frappe HR",
+				name: "FlowHR",
+				short_name: "FlowHR",
 				start_url: "/hrms",
 				description: "Everyday HR & Payroll operations at your fingertips",
 				theme_color: "#ffffff",
@@ -111,7 +109,7 @@ function getProxyOptions() {
 function getCommonSiteConfig() {
 	let currentDir = path.resolve(".")
 	// traverse up till we find frappe-bench with sites directory
-	while (currentDir !== "/") {
+	while (true) {
 		if (
 			fs.existsSync(path.join(currentDir, "sites")) &&
 			fs.existsSync(path.join(currentDir, "apps"))
@@ -122,7 +120,9 @@ function getCommonSiteConfig() {
 			}
 			return null
 		}
-		currentDir = path.resolve(currentDir, "..")
+		const parentDir = path.resolve(currentDir, "..")
+		if (parentDir === currentDir) break
+		currentDir = parentDir
 	}
 	return null
 }
