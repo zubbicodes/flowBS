@@ -67,8 +67,80 @@ services:
         HRMS_GIT_URL="$${HRMS_GIT_URL:-https://github.com/syntaxusman/erphrm.git}"
         HRMS_BRANCH="$${HRMS_BRANCH:-develop}"
         HRMS_APP_DIR="$${HRMS_APP_DIR:-hrms}"
+        RAVEN_GIT_URL="$${RAVEN_GIT_URL:-https://github.com/syntaxusman/raven.git}"
+        RAVEN_BRANCH="$${RAVEN_BRANCH:-develop}"
+        RAVEN_APP_DIR="$${RAVEN_APP_DIR:-raven}"
+        RAVEN_MOUNT_DIR="$${RAVEN_MOUNT_DIR:-}"
+        RAVEN_BUILD_ASSETS="$${RAVEN_BUILD_ASSETS:-1}"
+        FAST_START="$${FAST_START:-0}"
         BENCH_DIR="/home/frappe/frappe-bench"
         INIT_DIR="/tmp/frappe-bench-init"
+
+        ensure_app_checkout() {
+          app_dir="$$1"
+          git_url="$$2"
+          branch="$$3"
+          mount_dir="$${4:-}"
+
+          if [ -L "apps/$${app_dir}" ] && [ ! -e "apps/$${app_dir}" ]; then
+            rm -f "apps/$${app_dir}"
+          fi
+
+          if [ -n "$${mount_dir}" ] && [ -f "$${mount_dir}/pyproject.toml" ]; then
+            echo "Using mounted app $${app_dir} from $${mount_dir}"
+            rm -rf "apps/$${app_dir}"
+            ln -s "$${mount_dir}" "apps/$${app_dir}"
+            return
+          fi
+
+          if [ ! -d "apps/$${app_dir}" ]; then
+            echo "Cloning $${app_dir} app from $${git_url} branch $${branch}"
+            git clone --depth 1 --branch "$${branch}" "$${git_url}" "apps/$${app_dir}"
+          elif [ -d "apps/$${app_dir}/.git" ]; then
+            echo "Updating $${app_dir} app from $${git_url} branch $${branch}"
+            git -C "apps/$${app_dir}" remote set-url upstream "$${git_url}" 2>/dev/null || git -C "apps/$${app_dir}" remote add upstream "$${git_url}"
+            git -C "apps/$${app_dir}" fetch upstream "$${branch}" --depth 1
+            git -C "apps/$${app_dir}" checkout -B "$${branch}" "upstream/$${branch}"
+          else
+            echo "Using existing apps/$${app_dir}"
+          fi
+        }
+
+        install_python_app() {
+          app_dir="$$1"
+          "$${BENCH_DIR}/env/bin/python" -m pip install --quiet -e "$${BENCH_DIR}/apps/$${app_dir}"
+        }
+
+        app_installed() {
+          bench --site "$${SITE_NAME}" list-apps | awk "{print \$$1}" | grep -qx "$$1"
+        }
+
+        build_raven_assets() {
+          if [ ! -f "apps/$${RAVEN_APP_DIR}/package.json" ]; then
+            echo "Raven package.json not found, skipping Raven frontend asset build"
+            return
+          fi
+
+          (
+            cd "apps/$${RAVEN_APP_DIR}"
+            cp package.json package.json.raven-build-backup
+            if [ -f yarn.lock ]; then
+              cp yarn.lock yarn.lock.raven-build-backup
+            fi
+            restore_raven_package_files() {
+              mv -f package.json.raven-build-backup package.json
+              if [ -f yarn.lock.raven-build-backup ]; then
+                mv -f yarn.lock.raven-build-backup yarn.lock
+              fi
+            }
+            trap restore_raven_package_files EXIT
+
+            node -e "const fs = require('fs'); const p = JSON.parse(fs.readFileSync('package.json', 'utf8')); if (Array.isArray(p.workspaces)) p.workspaces = p.workspaces.filter((workspace) => workspace !== 'apps/*'); fs.writeFileSync('package.json', JSON.stringify(p, null, 2) + '\n');"
+            yarn install --check-files --ignore-scripts --network-timeout 600000
+            yarn build
+          )
+          bench build --app raven
+        }
 
         if [ -d "$${BENCH_DIR}/apps/frappe" ] && [ -f "$${BENCH_DIR}/sites/common_site_config.json" ] && [ -f "$${BENCH_DIR}/sites/$${SITE_NAME}/site_config.json" ] && "$${BENCH_DIR}/env/bin/python" -c "import frappe" >/dev/null 2>&1; then
           echo "Bench already exists, starting"
@@ -85,7 +157,14 @@ services:
             git -C "apps/$${HRMS_APP_DIR}" fetch upstream "$${HRMS_BRANCH}" --depth 1
             git -C "apps/$${HRMS_APP_DIR}" checkout -B "$${HRMS_BRANCH}" "upstream/$${HRMS_BRANCH}"
           fi
+          ensure_app_checkout "$${RAVEN_APP_DIR}" "$${RAVEN_GIT_URL}" "$${RAVEN_BRANCH}" "$${RAVEN_MOUNT_DIR}"
+          printf "frappe\nerpnext\nhrms\nraven\n" > sites/apps.txt
           "$${BENCH_DIR}/env/bin/python" -m pip install --quiet -e "$${BENCH_DIR}/apps/$${HRMS_APP_DIR}"
+          install_python_app "$${RAVEN_APP_DIR}"
+          if [ "$${FAST_START}" = "1" ] && app_installed hrms && app_installed raven; then
+            echo "FAST_START=1 and required apps are installed; starting bench without build/migrate"
+            bench start
+          fi
           if [ -f "apps/$${HRMS_APP_DIR}/package.json" ]; then
             yarn --cwd "apps/$${HRMS_APP_DIR}" install --check-files
           fi
@@ -96,9 +175,18 @@ services:
             yarn --cwd "apps/$${HRMS_APP_DIR}/roster" install --check-files
           fi
           bench build --app hrms
-          if ! bench --site "$${SITE_NAME}" list-apps | grep -qx "hrms"; then
+          if [ "$${RAVEN_BUILD_ASSETS}" = "1" ]; then
+            build_raven_assets
+          else
+            echo "Skipping Raven frontend asset build because RAVEN_BUILD_ASSETS=$${RAVEN_BUILD_ASSETS}"
+          fi
+          if ! app_installed hrms; then
             echo "Installing HRMS on existing site $${SITE_NAME}"
             bench --site "$${SITE_NAME}" install-app hrms
+          fi
+          if ! app_installed raven; then
+            echo "Installing Raven on existing site $${SITE_NAME}"
+            bench --site "$${SITE_NAME}" install-app raven
           fi
           bench --site "$${SITE_NAME}" migrate
           bench --site "$${SITE_NAME}" clear-cache
@@ -140,8 +228,10 @@ services:
           echo "Cloning HRMS app from $${HRMS_GIT_URL} branch $${HRMS_BRANCH}"
           git clone --depth 1 --branch "$${HRMS_BRANCH}" "$${HRMS_GIT_URL}" "apps/$${HRMS_APP_DIR}"
         fi
-        printf "frappe\nerpnext\nhrms\n" > sites/apps.txt
+        ensure_app_checkout "$${RAVEN_APP_DIR}" "$${RAVEN_GIT_URL}" "$${RAVEN_BRANCH}" "$${RAVEN_MOUNT_DIR}"
+        printf "frappe\nerpnext\nhrms\nraven\n" > sites/apps.txt
         "$${BENCH_DIR}/env/bin/python" -m pip install --quiet -e "$${BENCH_DIR}/apps/$${HRMS_APP_DIR}"
+        install_python_app "$${RAVEN_APP_DIR}"
         if [ -f "apps/$${HRMS_APP_DIR}/package.json" ]; then
           yarn --cwd "apps/$${HRMS_APP_DIR}" install --check-files
         fi
@@ -152,6 +242,11 @@ services:
           yarn --cwd "apps/$${HRMS_APP_DIR}/roster" install --check-files
         fi
         bench build --app hrms
+        if [ "$${RAVEN_BUILD_ASSETS}" = "1" ]; then
+          build_raven_assets
+        else
+          echo "Skipping Raven frontend asset build because RAVEN_BUILD_ASSETS=$${RAVEN_BUILD_ASSETS}"
+        fi
 
         if [ ! -f "sites/$${SITE_NAME}/site_config.json" ]; then
           bench new-site "$${SITE_NAME}" \
@@ -163,11 +258,14 @@ services:
           echo "Site $${SITE_NAME} already exists, skipping site creation"
         fi
 
-        if ! bench --site "$${SITE_NAME}" list-apps | grep -qx "erpnext"; then
+        if ! app_installed erpnext; then
           bench --site "$${SITE_NAME}" install-app erpnext
         fi
-        if ! bench --site "$${SITE_NAME}" list-apps | grep -qx "hrms"; then
+        if ! app_installed hrms; then
           bench --site "$${SITE_NAME}" install-app hrms
+        fi
+        if ! app_installed raven; then
+          bench --site "$${SITE_NAME}" install-app raven
         fi
 
         bench --site "$${SITE_NAME}" set-config host_name "https://$${SITE_NAME}"
@@ -192,12 +290,21 @@ services:
       - HRMS_GIT_URL=${HRMS_GIT_URL:-https://github.com/syntaxusman/erphrm.git}
       - HRMS_BRANCH=${HRMS_BRANCH:-develop}
       - HRMS_APP_DIR=${HRMS_APP_DIR:-hrms}
+      - RAVEN_GIT_URL=${RAVEN_GIT_URL:-https://github.com/syntaxusman/raven.git}
+      - RAVEN_BRANCH=${RAVEN_BRANCH:-develop}
+      - RAVEN_APP_DIR=${RAVEN_APP_DIR:-raven}
+      - RAVEN_MOUNT_DIR=${RAVEN_MOUNT_DIR:-}
+      - RAVEN_BUILD_ASSETS=${RAVEN_BUILD_ASSETS:-1}
+      - FAST_START=${FAST_START:-0}
     working_dir: /home/frappe
     volumes:
       - frappe-bench:/home/frappe/frappe-bench
     expose:
       - "8000"
       - "9000"
+    ports:
+      - "${FRAPPE_HTTP_PORT:-8000}:8000"
+      - "${FRAPPE_SOCKETIO_PORT:-9000}:9000"
 
 volumes:
   mariadb-data:
