@@ -302,9 +302,6 @@ services:
     expose:
       - "8000"
       - "9000"
-    ports:
-      - "${FRAPPE_HTTP_PORT:-8000}:8000"
-      - "${FRAPPE_SOCKETIO_PORT:-9000}:9000"
 
 volumes:
   mariadb-data:
