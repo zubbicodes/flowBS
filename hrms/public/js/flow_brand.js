@@ -37,9 +37,14 @@
       const source = image.getAttribute("src") || ""
       const alt = image.getAttribute("alt") || ""
       if (/frappe(?:-framework|-hr)?-logo|erpnext-logo|raven-logo/i.test(`${source} ${alt}`)) {
-        image.src = "/assets/hrms/images/flow-logo.svg"
+        image.src = "/assets/hrms/images/flow-logo.png"
         image.alt = BRAND.master
       }
+    })
+
+    document.querySelectorAll('link[rel~="icon"]:not([rel="apple-touch-startup-image"])').forEach((icon) => {
+      icon.href = "/assets/hrms/images/flow-logo.png"
+      icon.type = "image/png"
     })
   }
 

@@ -1,10 +1,11 @@
 :root {
   --flow-navy: #0f172a;
-  --flow-indigo: #4f46e5;
-  --flow-cyan: #06b6d4;
+  --flow-green: #109870;
+  --flow-green-dark: #0d7d5d;
+  --flow-mint: #36c99a;
   --flow-surface: #f8fafc;
-  --primary: var(--flow-indigo);
-  --primary-color: var(--flow-indigo);
+  --primary: var(--flow-green);
+  --primary-color: var(--flow-green);
 }
 
 .flow-brand {
@@ -31,17 +32,31 @@
 .btn-primary,
 .btn-primary-dark,
 .btn-primary-light {
-  --btn-bg: var(--flow-indigo);
+  --btn-bg: var(--flow-green);
+  --btn-hover-bg: var(--flow-green-dark);
+  --btn-active-bg: var(--flow-green-dark);
   --btn-color: #fff;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--flow-green-dark);
+  border-color: var(--flow-green-dark);
+}
+
+.text-primary,
+a.text-primary {
+  color: var(--flow-green) !important;
 }
 
 .indicator-pill.blue,
 .indicator-pill.blue::before {
-  --indicator-color: var(--flow-indigo);
+  --indicator-color: var(--flow-green);
 }
 
 .flow-gradient-text {
-  background: linear-gradient(120deg, var(--flow-indigo), var(--flow-cyan));
+  background: linear-gradient(120deg, var(--flow-green-dark), var(--flow-mint));
   background-clip: text;
   color: transparent;
 }

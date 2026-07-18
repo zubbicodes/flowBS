@@ -25,8 +25,10 @@ export default defineConfig({
 				name: "FlowHR",
 				short_name: "FlowHR",
 				start_url: "/hrms",
+				scope: "/hrms",
 				description: "Everyday HR & Payroll operations at your fingertips",
-				theme_color: "#ffffff",
+				background_color: "#ffffff",
+				theme_color: "#109870",
 				icons: [
 					{
 						src: "/assets/hrms/manifest/manifest-icon-192.maskable.png",

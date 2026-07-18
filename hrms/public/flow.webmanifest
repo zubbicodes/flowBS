@@ -7,7 +7,7 @@
   "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#111827",
+  "theme_color": "#109870",
   "icons": [
     {
       "src": "/assets/hrms/manifest/manifest-icon-192.maskable.png",

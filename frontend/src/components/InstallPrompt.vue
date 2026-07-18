@@ -19,7 +19,7 @@
 	<Popover :show="iosInstallMessage" placement="bottom">
 		<template #body>
 			<div
-				class="mt-[calc(100vh-15rem)] flex flex-col gap-3 mx-2 rounded py-5 bg-blue-100 drop-shadow-xl"
+				class="mt-[calc(100vh-15rem)] flex flex-col gap-3 mx-2 rounded py-5 bg-green-100 drop-shadow-xl"
 			>
 				<div
 					class="flex flex-row text-center items-center justify-between mb-1 px-3"
@@ -42,7 +42,7 @@
 						</span>
 						<span class="inline-flex items-start whitespace-nowrap">
 							<span>Tap&nbsp;</span>
-							<FeatherIcon name="share" class="h-4 w-4 text-blue-600" />
+							<FeatherIcon name="share" class="h-4 w-4 text-green-600" />
 							<span>&nbsp;and then "Add to Home Screen"</span>
 						</span>
 					</span>

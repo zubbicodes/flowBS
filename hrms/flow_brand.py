@@ -10,7 +10,7 @@ BRAND = {
 	"connect": "FlowConnect",
 	"roster": "FlowRoster",
 	"careers": "FlowCareers",
-	"logo": "/assets/hrms/images/flow-logo.svg",
+	"logo": "/assets/hrms/images/flow-logo.png",
 }
 
 

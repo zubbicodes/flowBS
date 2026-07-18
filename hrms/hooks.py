@@ -9,13 +9,13 @@ app_email = os.environ.get("FLOW_SUPPORT_EMAIL", "support@flow.local")
 app_license = "GNU General Public License (v3)"
 required_apps = ["frappe/erpnext"]
 source_link = os.environ.get("HRMS_GIT_URL", "https://github.com/zubbicodes/erphrm.git").removesuffix(".git")
-app_logo_url = "/assets/hrms/images/flow-logo.svg"
+app_logo_url = "/assets/hrms/images/flow-logo.png"
 app_home = "/desk/hr-setup"
 
 add_to_apps_screen = [
 	{
 		"name": "hrms",
-		"logo": "/assets/hrms/images/flow-logo.svg",
+		"logo": "/assets/hrms/images/flow-logo.png",
 		"title": "FlowHR",
 		"route": app_home,
 		"has_permission": "hrms.hr.utils.check_app_permission",
@@ -37,10 +37,10 @@ app_include_css = ["hrms.bundle.css", "/assets/hrms/css/flow_brand.css"]
 # website
 
 # include js, css files in header of web template
-web_include_css = "/assets/hrms/css/flow_brand.css"
-web_include_js = "/assets/hrms/js/flow_brand.js?v=20260718-pwa"
-brand_html = '<span class="flow-brand"><img src="/assets/hrms/images/flow-logo.svg" alt="FLOW">FLOW</span>'
-website_context = {"favicon": "/assets/hrms/images/flow-logo.svg"}
+web_include_css = "/assets/hrms/css/flow_brand.css?v=20260718-green"
+web_include_js = "/assets/hrms/js/flow_brand.js?v=20260718-green"
+brand_html = '<span class="flow-brand"><img src="/assets/hrms/images/flow-logo.png" alt="FLOW">FLOW</span>'
+website_context = {"favicon": "/assets/hrms/images/flow-logo.png"}
 update_website_context = "hrms.flow_brand.update_website_context"
 default_mail_footer = """
 <div style="color:#64748b;font-size:12px;margin-top:24px">

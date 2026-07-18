@@ -240,7 +240,7 @@ def _send_to_token(token: str, title: str, body: str, link: str, data=None, icon
 			"title": strip_html(title or "FLOW")[:200],
 			"body": strip_html(body or "")[:MAX_DATA_VALUE_LENGTH],
 			"click_action": link or frappe.utils.get_url(),
-			"notification_icon": icon or f"{frappe.utils.get_url()}/assets/hrms/images/flow-logo.svg",
+			"notification_icon": icon or f"{frappe.utils.get_url()}/assets/hrms/images/flow-logo.png",
 		}
 	)
 	payload = {
