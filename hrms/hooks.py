@@ -30,7 +30,7 @@ add_to_apps_screen = [
 # app_include_css = "/assets/hrms/css/hrms.css"
 app_include_js = [
 	"hrms.bundle.js",
-	"/assets/hrms/js/flow_brand.js",
+	"/assets/hrms/js/flow_brand.js?v=20260718-pwa",
 ]
 app_include_css = ["hrms.bundle.css", "/assets/hrms/css/flow_brand.css"]
 
@@ -38,7 +38,7 @@ app_include_css = ["hrms.bundle.css", "/assets/hrms/css/flow_brand.css"]
 
 # include js, css files in header of web template
 web_include_css = "/assets/hrms/css/flow_brand.css"
-web_include_js = "/assets/hrms/js/flow_brand.js"
+web_include_js = "/assets/hrms/js/flow_brand.js?v=20260718-pwa"
 brand_html = '<span class="flow-brand"><img src="/assets/hrms/images/flow-logo.svg" alt="FLOW">FLOW</span>'
 website_context = {"favicon": "/assets/hrms/images/flow-logo.svg"}
 update_website_context = "hrms.flow_brand.update_website_context"
