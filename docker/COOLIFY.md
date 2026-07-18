@@ -21,7 +21,7 @@ The gateway image is a two-line Nginx build using only the small `docker`
 directory as its build context. The Nginx configuration is copied into the
 image so deployment does not depend on Coolify host bind mounts.
 
-The HRMS app is fetched during first boot using `HRMS_GIT_URL`, `HRMS_BRANCH`, and `HRMS_APP_DIR`. It is cloned into `apps/hrms` by default so Frappe can install the `hrms` app even though the GitHub repository is named `erphrm`.
+The HRMS, FlowConnect, and Telegram Drive apps are fetched during first boot and refreshed on later redeploys. Telegram Drive's repository contains its Frappe app in a nested `telegram_drive` directory, which the startup script installs and builds automatically.
 
 ## Required environment variables
 
@@ -44,6 +44,11 @@ RAVEN_GIT_URL=https://github.com/zubbicodes/raven.git
 RAVEN_BRANCH=develop
 RAVEN_APP_DIR=raven
 RAVEN_BUILD_ASSETS=1
+TELEGRAM_DRIVE_GIT_URL=https://github.com/zubbicodes/TelegramDriveFrappe.git
+TELEGRAM_DRIVE_BRANCH=main
+TELEGRAM_DRIVE_CHECKOUT_DIR=telegram_drive_source
+TELEGRAM_DRIVE_SOURCE_SUBDIR=telegram_drive
+TELEGRAM_DRIVE_BUILD_ASSETS=1
 FAST_START=0
 ```
 
@@ -140,6 +145,16 @@ The startup check validates that the existing bench can actually `import frappe`
 On existing benches, startup also verifies that the `hrms` app is present and installed on `SITE_NAME`; this covers earlier deployments that reached ERPNext but skipped Frappe HR.
 
 On every redeploy, the existing `apps/hrms` checkout is updated from `HRMS_GIT_URL` and `HRMS_BRANCH`, then dependencies/assets/migrations are refreshed so pushed repository changes are reflected.
+
+Telegram Drive is installed as the Frappe app `telegram_drive`. Its Python dependencies and React frontend are installed and built automatically. Telegram session files and temporary transfers are stored below `sites/<site>/private/telegram_drive`, inside the persistent `frappe-bench` volume.
+
+After the first successful deployment:
+
+1. Sign in as `Administrator` and open **Telegram Drive** from the app launcher.
+2. Enter the Telegram API ID and API hash created at `my.telegram.org`, then complete the phone verification flow.
+3. Assign `Telegram Drive Admin` or `Telegram Drive User` to other Frappe users that need the app. Configure their detailed drive permissions from Telegram Drive.
+
+Do not enable `ignore_csrf`; Telegram Drive uses Frappe CSRF tokens for authenticated changes. Keep Telegram API credentials in the encrypted Telegram Drive settings rather than Coolify environment variables.
 
 Startup also removes the stale legacy app entry `erpnexthrms` from `sites/apps.txt` before building, because the current Frappe HR module name is `hrms`.
 

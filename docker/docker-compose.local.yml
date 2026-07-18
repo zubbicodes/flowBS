@@ -3,6 +3,7 @@ services:
     environment:
       HRMS_MOUNT_DIR: /workspace/hrms
       RAVEN_MOUNT_DIR: /workspace/hrms/raven
+      TELEGRAM_DRIVE_MOUNT_DIR: /workspace/hrms/telegram-drive
     volumes:
       - ..:/workspace/hrms
       - /workspace/hrms/node_modules
@@ -11,6 +12,7 @@ services:
       - /workspace/hrms/raven/node_modules
       - /workspace/hrms/raven/frontend/node_modules
       - /workspace/hrms/raven/apps/mobile/node_modules
+      - /workspace/hrms/telegram-drive/telegram_drive/frontend/node_modules
     ports:
       - "${FRAPPE_HTTP_PORT:-8000}:8000"
       - "${FRAPPE_SOCKETIO_PORT:-9000}:9000"

@@ -44,7 +44,8 @@ services:
             /workspace/hrms/roster/node_modules \
             /workspace/hrms/raven/node_modules \
             /workspace/hrms/raven/frontend/node_modules \
-            /workspace/hrms/raven/apps/mobile/node_modules; do
+            /workspace/hrms/raven/apps/mobile/node_modules \
+            /workspace/hrms/telegram-drive/telegram_drive/frontend/node_modules; do
             if [ -d "$${dependency_dir}" ]; then
               chown -R frappe:frappe "$${dependency_dir}"
             fi
@@ -88,6 +89,12 @@ services:
         RAVEN_APP_DIR="$${RAVEN_APP_DIR:-raven}"
         RAVEN_MOUNT_DIR="$${RAVEN_MOUNT_DIR:-}"
         RAVEN_BUILD_ASSETS="$${RAVEN_BUILD_ASSETS:-1}"
+        TELEGRAM_DRIVE_GIT_URL="$${TELEGRAM_DRIVE_GIT_URL:-https://github.com/zubbicodes/TelegramDriveFrappe.git}"
+        TELEGRAM_DRIVE_BRANCH="$${TELEGRAM_DRIVE_BRANCH:-main}"
+        TELEGRAM_DRIVE_CHECKOUT_DIR="$${TELEGRAM_DRIVE_CHECKOUT_DIR:-telegram_drive_source}"
+        TELEGRAM_DRIVE_SOURCE_SUBDIR="$${TELEGRAM_DRIVE_SOURCE_SUBDIR:-telegram_drive}"
+        TELEGRAM_DRIVE_MOUNT_DIR="$${TELEGRAM_DRIVE_MOUNT_DIR:-}"
+        TELEGRAM_DRIVE_BUILD_ASSETS="$${TELEGRAM_DRIVE_BUILD_ASSETS:-1}"
         FAST_START="$${FAST_START:-0}"
         BENCH_DIR="/home/frappe/frappe-bench"
         INIT_DIR="/tmp/frappe-bench-init"
@@ -102,7 +109,7 @@ services:
             rm -f "apps/$${app_dir}"
           fi
 
-          if [ -n "$${mount_dir}" ] && [ -f "$${mount_dir}/pyproject.toml" ]; then
+          if [ -n "$${mount_dir}" ] && { [ -f "$${mount_dir}/pyproject.toml" ] || [ -d "$${mount_dir}/.git" ] || [ -f "$${mount_dir}/.git" ]; }; then
             echo "Using mounted app $${app_dir} from $${mount_dir}"
             rm -rf "apps/$${app_dir}"
             ln -s "$${mount_dir}" "apps/$${app_dir}"
@@ -167,6 +174,40 @@ services:
           bench build --app raven
         }
 
+        telegram_drive_app_path() {
+          printf "apps/%s/%s" "$${TELEGRAM_DRIVE_CHECKOUT_DIR}" "$${TELEGRAM_DRIVE_SOURCE_SUBDIR}"
+        }
+
+        link_telegram_drive_app() {
+          app_path="$$(telegram_drive_app_path)"
+          if [ -e apps/telegram_drive ] && [ ! -L apps/telegram_drive ]; then
+            echo "Cannot link Telegram Drive because apps/telegram_drive already exists and is not a symlink"
+            exit 1
+          fi
+          rm -f apps/telegram_drive
+          ln -s "$${TELEGRAM_DRIVE_CHECKOUT_DIR}/$${TELEGRAM_DRIVE_SOURCE_SUBDIR}" apps/telegram_drive
+        }
+
+        build_telegram_drive_assets() {
+          app_path="$$(telegram_drive_app_path)"
+          frontend_path="$${app_path}/frontend"
+          if [ ! -f "$${frontend_path}/package.json" ]; then
+            echo "Telegram Drive frontend package.json not found, skipping frontend asset build"
+            return
+          fi
+
+          (
+            cd "$${frontend_path}"
+            if [ -f package-lock.json ]; then
+              npm ci --no-audit --no-fund
+            else
+              npm install --no-audit --no-fund
+            fi
+            npm run build
+          )
+          bench build --app telegram_drive
+        }
+
         if [ -d "$${BENCH_DIR}/apps/frappe" ] && [ -f "$${BENCH_DIR}/sites/common_site_config.json" ] && [ -f "$${BENCH_DIR}/sites/$${SITE_NAME}/site_config.json" ] && "$${BENCH_DIR}/env/bin/python" -c "import frappe" >/dev/null 2>&1; then
           echo "Bench already exists, starting"
           cd "$${BENCH_DIR}"
@@ -178,10 +219,18 @@ services:
           bench --site "$${SITE_NAME}" set-config flow_support_email "$${FLOW_SUPPORT_EMAIL}"
           ensure_app_checkout "$${HRMS_APP_DIR}" "$${HRMS_GIT_URL}" "$${HRMS_BRANCH}" "$${HRMS_MOUNT_DIR}"
           ensure_app_checkout "$${RAVEN_APP_DIR}" "$${RAVEN_GIT_URL}" "$${RAVEN_BRANCH}" "$${RAVEN_MOUNT_DIR}"
-          printf "frappe\nerpnext\nhrms\nraven\n" > sites/apps.txt
+          ensure_app_checkout "$${TELEGRAM_DRIVE_CHECKOUT_DIR}" "$${TELEGRAM_DRIVE_GIT_URL}" "$${TELEGRAM_DRIVE_BRANCH}" "$${TELEGRAM_DRIVE_MOUNT_DIR}"
+          TELEGRAM_DRIVE_APP_PATH="$$(telegram_drive_app_path)"
+          if [ ! -f "$${TELEGRAM_DRIVE_APP_PATH}/pyproject.toml" ]; then
+            echo "Telegram Drive app not found at $${TELEGRAM_DRIVE_APP_PATH}"
+            exit 1
+          fi
+          link_telegram_drive_app
+          printf "frappe\nerpnext\nhrms\nraven\ntelegram_drive\n" > sites/apps.txt
           "$${BENCH_DIR}/env/bin/python" -m pip install --quiet -e "$${BENCH_DIR}/apps/$${HRMS_APP_DIR}"
           install_python_app "$${RAVEN_APP_DIR}"
-          if [ "$${FAST_START}" = "1" ] && app_installed hrms && app_installed raven; then
+          install_python_app telegram_drive
+          if [ "$${FAST_START}" = "1" ] && app_installed hrms && app_installed raven && app_installed telegram_drive; then
             echo "FAST_START=1 and required apps are installed; starting bench without build/migrate"
             bench start
           fi
@@ -200,6 +249,11 @@ services:
           else
             echo "Skipping Raven frontend asset build because RAVEN_BUILD_ASSETS=$${RAVEN_BUILD_ASSETS}"
           fi
+          if [ "$${TELEGRAM_DRIVE_BUILD_ASSETS}" = "1" ]; then
+            build_telegram_drive_assets
+          else
+            echo "Skipping Telegram Drive frontend asset build because TELEGRAM_DRIVE_BUILD_ASSETS=$${TELEGRAM_DRIVE_BUILD_ASSETS}"
+          fi
           if ! app_installed hrms; then
             echo "Installing HRMS on existing site $${SITE_NAME}"
             bench --site "$${SITE_NAME}" install-app hrms
@@ -207,6 +261,10 @@ services:
           if ! app_installed raven; then
             echo "Installing Raven on existing site $${SITE_NAME}"
             bench --site "$${SITE_NAME}" install-app raven
+          fi
+          if ! app_installed telegram_drive; then
+            echo "Installing Telegram Drive on existing site $${SITE_NAME}"
+            bench --site "$${SITE_NAME}" install-app telegram_drive
           fi
           bench --site "$${SITE_NAME}" migrate
           bench --site "$${SITE_NAME}" clear-cache
@@ -247,9 +305,17 @@ services:
         bench get-app erpnext
         ensure_app_checkout "$${HRMS_APP_DIR}" "$${HRMS_GIT_URL}" "$${HRMS_BRANCH}" "$${HRMS_MOUNT_DIR}"
         ensure_app_checkout "$${RAVEN_APP_DIR}" "$${RAVEN_GIT_URL}" "$${RAVEN_BRANCH}" "$${RAVEN_MOUNT_DIR}"
-        printf "frappe\nerpnext\nhrms\nraven\n" > sites/apps.txt
+        ensure_app_checkout "$${TELEGRAM_DRIVE_CHECKOUT_DIR}" "$${TELEGRAM_DRIVE_GIT_URL}" "$${TELEGRAM_DRIVE_BRANCH}" "$${TELEGRAM_DRIVE_MOUNT_DIR}"
+        TELEGRAM_DRIVE_APP_PATH="$$(telegram_drive_app_path)"
+        if [ ! -f "$${TELEGRAM_DRIVE_APP_PATH}/pyproject.toml" ]; then
+          echo "Telegram Drive app not found at $${TELEGRAM_DRIVE_APP_PATH}"
+          exit 1
+        fi
+        link_telegram_drive_app
+        printf "frappe\nerpnext\nhrms\nraven\ntelegram_drive\n" > sites/apps.txt
         "$${BENCH_DIR}/env/bin/python" -m pip install --quiet -e "$${BENCH_DIR}/apps/$${HRMS_APP_DIR}"
         install_python_app "$${RAVEN_APP_DIR}"
+        install_python_app telegram_drive
         if [ -f "apps/$${HRMS_APP_DIR}/package.json" ]; then
           yarn --cwd "apps/$${HRMS_APP_DIR}" install --check-files
         fi
@@ -264,6 +330,11 @@ services:
           build_raven_assets
         else
           echo "Skipping Raven frontend asset build because RAVEN_BUILD_ASSETS=$${RAVEN_BUILD_ASSETS}"
+        fi
+        if [ "$${TELEGRAM_DRIVE_BUILD_ASSETS}" = "1" ]; then
+          build_telegram_drive_assets
+        else
+          echo "Skipping Telegram Drive frontend asset build because TELEGRAM_DRIVE_BUILD_ASSETS=$${TELEGRAM_DRIVE_BUILD_ASSETS}"
         fi
 
         if [ ! -f "sites/$${SITE_NAME}/site_config.json" ]; then
@@ -284,6 +355,9 @@ services:
         fi
         if ! app_installed raven; then
           bench --site "$${SITE_NAME}" install-app raven
+        fi
+        if ! app_installed telegram_drive; then
+          bench --site "$${SITE_NAME}" install-app telegram_drive
         fi
 
         bench --site "$${SITE_NAME}" set-config host_name "$${FLOW_SITE_URL}"
@@ -322,6 +396,12 @@ services:
       - RAVEN_APP_DIR=${RAVEN_APP_DIR:-raven}
       - RAVEN_MOUNT_DIR=${RAVEN_MOUNT_DIR:-}
       - RAVEN_BUILD_ASSETS=${RAVEN_BUILD_ASSETS:-1}
+      - TELEGRAM_DRIVE_GIT_URL=${TELEGRAM_DRIVE_GIT_URL:-https://github.com/zubbicodes/TelegramDriveFrappe.git}
+      - TELEGRAM_DRIVE_BRANCH=${TELEGRAM_DRIVE_BRANCH:-main}
+      - TELEGRAM_DRIVE_CHECKOUT_DIR=${TELEGRAM_DRIVE_CHECKOUT_DIR:-telegram_drive_source}
+      - TELEGRAM_DRIVE_SOURCE_SUBDIR=${TELEGRAM_DRIVE_SOURCE_SUBDIR:-telegram_drive}
+      - TELEGRAM_DRIVE_MOUNT_DIR=${TELEGRAM_DRIVE_MOUNT_DIR:-}
+      - TELEGRAM_DRIVE_BUILD_ASSETS=${TELEGRAM_DRIVE_BUILD_ASSETS:-1}
       - FAST_START=${FAST_START:-0}
     working_dir: /home/frappe
     volumes:
