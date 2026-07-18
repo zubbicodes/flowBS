@@ -30,7 +30,14 @@ def get_brand():
 
 
 def extend_bootinfo(bootinfo):
-	bootinfo.flow_brand = frappe._dict(get_brand())
+	brand = frappe._dict(get_brand())
+	bootinfo.flow_brand = brand
+
+	# Frappe builds the app launcher from each installed app's hooks before this
+	# extension runs. Normalize those records here so framework and ERP apps use
+	# the same FLOW identity without maintaining forks of either dependency.
+	for app in bootinfo.get("app_data") or []:
+		app["app_logo_url"] = brand.logo
 
 
 def update_website_context(context):

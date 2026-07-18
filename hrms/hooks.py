@@ -30,9 +30,9 @@ add_to_apps_screen = [
 # app_include_css = "/assets/hrms/css/hrms.css"
 app_include_js = [
 	"hrms.bundle.js",
-	"/assets/hrms/js/flow_brand.js?v=20260718-pwa",
+	"/assets/hrms/js/flow_brand.js?v=20260718-launcher",
 ]
-app_include_css = ["hrms.bundle.css", "/assets/hrms/css/flow_brand.css"]
+app_include_css = ["hrms.bundle.css", "/assets/hrms/css/flow_brand.css?v=20260718-launcher"]
 
 # website
 
