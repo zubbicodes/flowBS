@@ -8,9 +8,14 @@ BRAND = {
 	"erp": "FlowERP",
 	"hr": "FlowHR",
 	"connect": "FlowConnect",
+	"drive": "FlowDrive",
 	"roster": "FlowRoster",
 	"careers": "FlowCareers",
 	"logo": "/assets/hrms/images/flow-logo.png",
+	"erp_logo": "/assets/hrms/images/flow_erp_logo.png",
+	"hr_logo": "/assets/hrms/images/flow_hr_logo.png",
+	"connect_logo": "/assets/hrms/images/flow_conncet_logo.png",
+	"drive_logo": "/assets/hrms/images/flow_drive_logo.png",
 }
 
 
@@ -33,11 +38,21 @@ def extend_bootinfo(bootinfo):
 	brand = frappe._dict(get_brand())
 	bootinfo.flow_brand = brand
 
-	# Frappe builds the app launcher from each installed app's hooks before this
-	# extension runs. Normalize those records here so framework and ERP apps use
-	# the same FLOW identity without maintaining forks of either dependency.
+	# Frappe builds the launcher before this extension runs. Apply the dedicated
+	# product logo to each FLOW app while leaving Framework unchanged.
 	for app in bootinfo.get("app_data") or []:
-		app["app_logo_url"] = brand.logo
+		identity = " ".join(
+			str(app.get(key) or "")
+			for key in ("app_name", "name", "title", "app_title", "route")
+		).lower()
+		if "erpnext" in identity or "flowerp" in identity:
+			app["app_logo_url"] = brand.erp_logo
+		elif "hrms" in identity or "flowhr" in identity:
+			app["app_logo_url"] = brand.hr_logo
+		elif "raven" in identity or "flowconnect" in identity:
+			app["app_logo_url"] = brand.connect_logo
+		elif "telegram_drive" in identity or "telegram-drive" in identity or "flowdrive" in identity:
+			app["app_logo_url"] = brand.drive_logo
 
 
 def update_website_context(context):

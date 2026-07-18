@@ -9,13 +9,13 @@ app_email = os.environ.get("FLOW_SUPPORT_EMAIL", "support@flow.local")
 app_license = "GNU General Public License (v3)"
 required_apps = ["frappe/erpnext"]
 source_link = os.environ.get("HRMS_GIT_URL", "https://github.com/zubbicodes/erphrm.git").removesuffix(".git")
-app_logo_url = "/assets/hrms/images/flow-logo.png"
+app_logo_url = "/assets/hrms/images/flow_hr_logo.png"
 app_home = "/desk/hr-setup"
 
 add_to_apps_screen = [
 	{
 		"name": "hrms",
-		"logo": "/assets/hrms/images/flow-logo.png",
+		"logo": "/assets/hrms/images/flow_hr_logo.png",
 		"title": "FlowHR",
 		"route": app_home,
 		"has_permission": "hrms.hr.utils.check_app_permission",
@@ -30,9 +30,9 @@ add_to_apps_screen = [
 # app_include_css = "/assets/hrms/css/hrms.css"
 app_include_js = [
 	"hrms.bundle.js",
-	"/assets/hrms/js/flow_brand.js?v=20260718-launcher",
+	"/assets/hrms/js/flow_brand.js?v=20260718-product-logos",
 ]
-app_include_css = ["hrms.bundle.css", "/assets/hrms/css/flow_brand.css?v=20260718-launcher"]
+app_include_css = ["hrms.bundle.css", "/assets/hrms/css/flow_brand.css?v=20260718-product-logos"]
 
 # website
 

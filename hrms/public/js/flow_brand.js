@@ -4,9 +4,18 @@
     erp: "FlowERP",
     hr: "FlowHR",
     connect: "FlowConnect",
+    drive: "FlowDrive",
+  })
+
+  const PRODUCT_LOGOS = Object.freeze({
+    erp: "/assets/hrms/images/flow_erp_logo.png",
+    hr: "/assets/hrms/images/flow_hr_logo.png",
+    connect: "/assets/hrms/images/flow_conncet_logo.png",
+    drive: "/assets/hrms/images/flow_drive_logo.png",
   })
 
   const substitutions = [
+    [/Telegram Drive/g, BRAND.drive],
     [/Frappe HR/g, BRAND.hr],
     [/ERPNext/g, BRAND.erp],
     [/Raven/g, BRAND.connect],
@@ -36,9 +45,19 @@
     document.querySelectorAll("img").forEach((image) => {
       const source = image.getAttribute("src") || ""
       const alt = image.getAttribute("alt") || ""
-      if (/frappe(?:-framework|-hr)?-logo|erpnext-logo|raven-logo/i.test(`${source} ${alt}`)) {
-        image.src = "/assets/hrms/images/flow-logo.png"
-        image.alt = BRAND.master
+      const identity = `${source} ${alt}`
+      if (/erpnext-logo|flowerp/i.test(identity)) {
+        image.src = PRODUCT_LOGOS.erp
+        image.alt = BRAND.erp
+      } else if (/frappe-hr-logo|flowhr/i.test(identity)) {
+        image.src = PRODUCT_LOGOS.hr
+        image.alt = BRAND.hr
+      } else if (/raven-logo|flowconnect/i.test(identity)) {
+        image.src = PRODUCT_LOGOS.connect
+        image.alt = BRAND.connect
+      } else if (/telegram-drive|telegram_drive|flowdrive/i.test(identity)) {
+        image.src = PRODUCT_LOGOS.drive
+        image.alt = BRAND.drive
       }
     })
 
