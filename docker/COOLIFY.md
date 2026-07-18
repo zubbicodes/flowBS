@@ -17,6 +17,9 @@ realtime messaging. It does not publish a host port, so you can deploy this
 compose stack multiple times for different clients on the same Coolify server.
 
 The `frappe` service uses the public `frappe/bench:latest` image directly. It does not build a custom image, which avoids Coolify build timeouts on slow servers.
+The gateway image is a two-line Nginx build using only the small `docker`
+directory as its build context. The Nginx configuration is copied into the
+image so deployment does not depend on Coolify host bind mounts.
 
 The HRMS app is fetched during first boot using `HRMS_GIT_URL`, `HRMS_BRANCH`, and `HRMS_APP_DIR`. It is cloned into `apps/hrms` by default so Frappe can install the `hrms` app even though the GitHub repository is named `erphrm`.
 
