@@ -14,6 +14,9 @@ class TestFLOWPush(UnitTestCase):
 			{"count": "2", "enabled": "1", "details": '{"name":"FLOW"}'},
 		)
 
+	def test_flow_product_targets_all_registered_suite_browsers(self):
+		self.assertEqual(push._normalise_product("flow"), "FLOW")
+
 	@patch.dict(
 		os.environ,
 		{
@@ -32,4 +35,3 @@ class TestFLOWPush(UnitTestCase):
 	def test_web_configuration_enables_browser_registration(self):
 		self.assertTrue(push.is_enabled())
 		self.assertEqual(push.get_firebase_web_config()["projectId"], "flow-test")
-

@@ -39,7 +39,7 @@ class PWANotification(Document):
 				title=self.reference_document_type or "FlowHR",
 				body=self.message,
 				link=self.get_notification_link(),
-				product="FlowHR",
+				product="FLOW",
 				icon=f"{frappe.utils.get_url()}/assets/hrms/manifest/favicon-196.png",
 				data={
 					"reference_doctype": self.reference_document_type or "",

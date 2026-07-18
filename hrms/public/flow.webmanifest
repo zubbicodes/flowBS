@@ -1,0 +1,37 @@
+{
+  "id": "/app",
+  "name": "FLOW Business Suite",
+  "short_name": "FLOW",
+  "description": "FLOW business, ERP, HR and collaboration suite",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#111827",
+  "icons": [
+    {
+      "src": "/assets/hrms/manifest/manifest-icon-192.maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/hrms/manifest/manifest-icon-512.maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "FlowHR",
+      "short_name": "HR",
+      "url": "/hrms"
+    },
+    {
+      "name": "FlowConnect",
+      "short_name": "Connect",
+      "url": "/raven"
+    }
+  ]
+}

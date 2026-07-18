@@ -153,6 +153,16 @@ class FrappePushNotification {
 		return localStorage.getItem(`firebase_token_${this.projectName}`) !== null
 	}
 
+	getDeviceID() {
+		const key = "flow_push_device_id"
+		let deviceID = localStorage.getItem(key)
+		if (!deviceID) {
+			deviceID = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`
+			localStorage.setItem(key, deviceID)
+		}
+		return deviceID
+	}
+
 	/**
 	 * Enable notification
 	 * This will return notification permission status and token
@@ -251,6 +261,7 @@ class FrappePushNotification {
 					body: JSON.stringify({
 						fcm_token: token,
 						product: this.projectName,
+						device_id: this.getDeviceID(),
 						device_information: navigator.userAgent,
 					}),
 					headers: {

@@ -8,6 +8,7 @@
  "field_order": [
   "user",
   "product",
+  "device_id",
   "token",
   "device_information"
  ],
@@ -26,8 +27,15 @@
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Product",
-   "options": "FlowHR\nFlowConnect",
+   "options": "FLOW\nFlowHR\nFlowConnect",
    "reqd": 1
+  },
+  {
+   "fieldname": "device_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Browser Installation ID",
+   "length": 140
   },
   {
    "fieldname": "token",

@@ -10,7 +10,13 @@ import frappe
 from frappe import _
 from frappe.utils import add_months, now_datetime, strip_html
 
-PRODUCTS = {"hrms": "FlowHR", "flowhr": "FlowHR", "raven": "FlowConnect", "flowconnect": "FlowConnect"}
+PRODUCTS = {
+	"flow": "FLOW",
+	"hrms": "FlowHR",
+	"flowhr": "FlowHR",
+	"raven": "FlowConnect",
+	"flowconnect": "FlowConnect",
+}
 FCM_SCOPE = "https://www.googleapis.com/auth/firebase.messaging"
 MAX_DATA_VALUE_LENGTH = 1000
 
@@ -66,7 +72,12 @@ def _normalise_product(product: str) -> str:
 
 
 @frappe.whitelist(methods=["POST"])
-def subscribe(fcm_token: str, product: str, device_information: str | None = None):
+def subscribe(
+	fcm_token: str,
+	product: str,
+	device_information: str | None = None,
+	device_id: str | None = None,
+):
 	if frappe.session.user == "Guest":
 		frappe.throw(_("Authentication required"), frappe.PermissionError)
 	if not is_enabled():
@@ -80,6 +91,7 @@ def subscribe(fcm_token: str, product: str, device_information: str | None = Non
 		doc = frappe.get_doc("FLOW Push Device", name)
 		doc.user = frappe.session.user
 		doc.product = product
+		doc.device_id = (device_id or "")[:140]
 		doc.device_information = (device_information or "")[:1000]
 		doc.save(ignore_permissions=True)
 	else:
@@ -88,6 +100,7 @@ def subscribe(fcm_token: str, product: str, device_information: str | None = Non
 				"doctype": "FLOW Push Device",
 				"user": frappe.session.user,
 				"product": product,
+				"device_id": (device_id or "")[:140],
 				"token": fcm_token,
 				"device_information": (device_information or "")[:1000],
 			}
@@ -149,17 +162,30 @@ def enqueue_notification_to_users(users, title: str, body: str, link: str, produ
 def send_notification_to_users(users, title: str, body: str, link: str, product: str, data=None, icon=None):
 	if not is_enabled(require_sender=True):
 		return
-	tokens = frappe.get_all(
+	product = _normalise_product(product)
+	filters = {"user": ("in", users)}
+	if product != "FLOW":
+		filters["product"] = product
+	devices = frappe.get_all(
 		"FLOW Push Device",
-		filters={"user": ("in", users), "product": _normalise_product(product)},
-		pluck="token",
+		filters=filters,
+		fields=["token", "device_id", "modified"],
+		order_by="modified desc",
 	)
-	for token in set(tokens):
+	tokens = []
+	seen_installations = set()
+	for device in devices:
+		installation = device.device_id or device.token
+		if installation in seen_installations:
+			continue
+		seen_installations.add(installation)
+		tokens.append(device.token)
+	for token in tokens:
 		_send_to_token(token, title, body, link, data=data, icon=icon)
 
 
 def notify_from_notification_log(doc, method=None):
-	"""Deliver standard Desk/ERP notifications to FlowHR-enabled browsers."""
+	"""Deliver standard Desk/ERP notifications to every enabled FLOW browser."""
 	if not is_enabled(require_sender=True):
 		return
 	user = getattr(doc, "for_user", None)
@@ -168,7 +194,7 @@ def notify_from_notification_log(doc, method=None):
 	document_type = getattr(doc, "document_type", None) or ""
 	document_name = getattr(doc, "document_name", None) or ""
 	# FlowHR creates richer PWA notifications for these documents.
-	if document_type in {"Leave Application", "Expense Claim"}:
+	if document_type in {"Leave Application", "Expense Claim", "Shift Request"}:
 		return
 	link = getattr(doc, "link", None)
 	if not link and document_type and document_name:
@@ -181,7 +207,7 @@ def notify_from_notification_log(doc, method=None):
 		title=document_type or "FLOW",
 		body=getattr(doc, "subject", None) or getattr(doc, "email_content", None) or "You have a new notification",
 		link=link,
-		product="FlowHR",
+		product="FLOW",
 		data={"reference_doctype": document_type, "reference_name": document_name},
 	)
 
