@@ -131,6 +131,15 @@ services:
           bench --site "$${SITE_NAME}" list-apps | awk "{print \$$1}" | grep -qx "$$1"
         }
 
+        configure_runtime() {
+          # bench init defaults to developer mode. Realtime authentication uses
+          # the global value and otherwise rewrites the public HTTPS origin to
+          # the internal webserver port.
+          bench set-config -g developer_mode "$${DEVELOPER_MODE}"
+          bench set-config -g webserver_host "http://127.0.0.1"
+          bench set-config -g webserver_port 8000
+        }
+
         build_raven_assets() {
           if [ ! -f "apps/$${RAVEN_APP_DIR}/package.json" ]; then
             echo "Raven package.json not found, skipping Raven frontend asset build"
@@ -163,6 +172,7 @@ services:
           cd "$${BENCH_DIR}"
           printf "frappe\nerpnext\nhrms\n" > sites/apps.txt
           bench use "$${SITE_NAME}"
+          configure_runtime
           bench --site "$${SITE_NAME}" set-config host_name "$${FLOW_SITE_URL}"
           bench --site "$${SITE_NAME}" set-config flow_site_url "$${FLOW_SITE_URL}"
           bench --site "$${SITE_NAME}" set-config flow_support_email "$${FLOW_SUPPORT_EMAIL}"
@@ -229,6 +239,7 @@ services:
         bench set-redis-cache-host redis://redis:6379
         bench set-redis-queue-host redis://redis:6379
         bench set-redis-socketio-host redis://redis:6379
+        configure_runtime
 
         sed -i "/redis/d" ./Procfile
         sed -i "/watch/d" ./Procfile
