@@ -39,6 +39,7 @@ RAVEN_BRANCH=develop
 RAVEN_APP_DIR=raven
 RAVEN_BUILD_ASSETS=1
 FAST_START=0
+NGINX_CONFIG_PATH=./docker/nginx.conf
 ```
 
 `SITE_NAME` should match the public domain you assign to the `frappe` service.
@@ -47,6 +48,11 @@ FAST_START=0
 `FLOW_SUPPORT_EMAIL` is the public support address shown by FlowHR and
 FlowConnect. Keep deployment credentials and environment-specific values in
 Coolify or an untracked `.env` file; do not commit them.
+
+`NGINX_CONFIG_PATH` is relative to Coolify's repository project directory and
+must remain `./docker/nginx.conf`. Local Compose runs default to
+`./nginx.conf` relative to the Compose file, so this variable is only required
+in Coolify.
 
 Use only the hostname for `SITE_NAME`, for example `client1.example.com`. Do not
 include `https://` or a port. In Coolify, set the gateway service domain to
