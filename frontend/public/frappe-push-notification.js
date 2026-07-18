@@ -63,6 +63,9 @@ class FrappePushNotification {
 		this.messaging = getMessaging(initializeApp(config))
 		this.onMessage(this.onMessageHandler)
 		this.initialized = true
+		if (Notification.permission === "granted" && this.isNotificationEnabled()) {
+			await this.enableNotification()
+		}
 	}
 
 	/**
@@ -88,10 +91,12 @@ class FrappePushNotification {
 			return this.webConfig
 		}
 		try {
-			let url = `${FrappePushNotification.relayServerBaseURL}/api/method/notification_relay.api.get_config?project_name=${this.projectName}`
+			let url = "/api/method/hrms.api.push.get_web_config"
 			let response = await fetch(url)
 			let response_json = await response.json()
-			this.webConfig = response_json.config
+			if (!response.ok) throw new Error(response_json?.message || "Push configuration unavailable")
+			this.webConfig = response_json.message.config
+			this.vapidPublicKey = response_json.message.vapid_public_key
 			return this.webConfig
 		} catch (e) {
 			throw new Error(
@@ -110,10 +115,7 @@ class FrappePushNotification {
 			return this.vapidPublicKey
 		}
 		try {
-			let url = `${FrappePushNotification.relayServerBaseURL}/api/method/notification_relay.api.get_config?project_name=${this.projectName}`
-			let response = await fetch(url)
-			let response_json = await response.json()
-			this.vapidPublicKey = response_json.vapid_public_key
+			await this.fetchWebConfig()
 			return this.vapidPublicKey
 		} catch (e) {
 			throw new Error(
@@ -183,20 +185,18 @@ class FrappePushNotification {
 			vapidKey: vapidKey,
 			serviceWorkerRegistration: this.serviceWorkerRegistration,
 		})
-		// register new token if token is changed
+		// Remove a rotated token before registering the current browser installation.
 		if (oldToken !== newToken) {
-			// unsubscribe old token
 			if (oldToken) {
 				await this.unregisterTokenHandler(oldToken)
 			}
-			// subscribe push notification and register token
-			let isSubscriptionSuccessful = await this.registerTokenHandler(newToken)
-			if (isSubscriptionSuccessful === false) {
-				throw new Error("Failed to subscribe to push notification")
-			}
-			// save token to local storage
-			localStorage.setItem(`firebase_token_${this.projectName}`, newToken)
 		}
+		// Re-register on startup as well, keeping ownership and last-seen time fresh.
+		let isSubscriptionSuccessful = await this.registerTokenHandler(newToken)
+		if (isSubscriptionSuccessful === false) {
+			throw new Error("Failed to subscribe to push notification")
+		}
+		localStorage.setItem(`firebase_token_${this.projectName}`, newToken)
 		this.token = newToken
 		return {
 			permission_granted: true,
@@ -227,7 +227,7 @@ class FrappePushNotification {
 		}
 		try {
 			await this.unregisterTokenHandler(this.token)
-		} catch {
+		} catch (e) {
 			console.error("Failed to unsubscribe from push notification")
 			console.error(e)
 		}
@@ -245,14 +245,17 @@ class FrappePushNotification {
 	async registerTokenHandler(token) {
 		try {
 			let response = await fetch(
-				"/api/method/frappe.push_notification.subscribe?fcm_token=" +
-					token +
-					"&project_name=" +
-					this.projectName,
+				"/api/method/hrms.api.push.subscribe",
 				{
-					method: "GET",
+					method: "POST",
+					body: JSON.stringify({
+						fcm_token: token,
+						product: this.projectName,
+						device_information: navigator.userAgent,
+					}),
 					headers: {
 						"Content-Type": "application/json",
+						"X-Frappe-CSRF-Token": window.csrf_token || window.frappe?.csrf_token,
 					},
 				}
 			)
@@ -272,14 +275,13 @@ class FrappePushNotification {
 	async unregisterTokenHandler(token) {
 		try {
 			let response = await fetch(
-				"/api/method/frappe.push_notification.unsubscribe?fcm_token=" +
-					token +
-					"&project_name=" +
-					this.projectName,
+				"/api/method/hrms.api.push.unsubscribe",
 				{
-					method: "GET",
+					method: "POST",
+					body: JSON.stringify({ fcm_token: token, product: this.projectName }),
 					headers: {
 						"Content-Type": "application/json",
+						"X-Frappe-CSRF-Token": window.csrf_token || window.frappe?.csrf_token,
 					},
 				}
 			)

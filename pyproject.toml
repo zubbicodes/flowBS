@@ -7,6 +7,9 @@ description = "FlowHR - HR and Payroll for the FLOW business suite"
 requires-python = ">=3.10"
 readme = "README.md"
 dynamic = ["version"]
+dependencies = [
+    "google-auth>=2.0,<3.0",
+]
 
 [build-system]
 requires = ["flit_core >=3.4,<4"]

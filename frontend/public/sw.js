@@ -22,22 +22,21 @@ try {
 	}
 
 	onBackgroundMessage(messaging, (payload) => {
-		const notificationTitle = payload.data.title
+		const data = payload.data || {}
+		const notificationTitle = data.title || "FLOW"
 		let notificationOptions = {
-			body: payload.data.body || "",
+			body: data.body || "",
+			data: { url: data.click_action || self.location.origin },
+			tag: data.tag || undefined,
 		}
-		if (payload.data.notification_icon) {
-			notificationOptions["icon"] = payload.data.notification_icon
+		if (data.notification_icon) {
+			notificationOptions["icon"] = data.notification_icon
 		}
-		if (isChrome()) {
-			notificationOptions["data"] = {
-				url: payload.data.click_action,
-			}
-		} else {
-			if (payload.data.click_action) {
+		if (!isChrome()) {
+			if (data.click_action) {
 				notificationOptions["actions"] = [
 					{
-						action: payload.data.click_action,
+						action: data.click_action,
 						title: "View Details",
 					},
 				]
@@ -46,15 +45,12 @@ try {
 		self.registration.showNotification(notificationTitle, notificationOptions)
 	})
 
-	if (isChrome()) {
-		self.addEventListener("notificationclick", (event) => {
-			event.stopImmediatePropagation()
-			event.notification.close()
-			if (event.notification.data && event.notification.data.url) {
-				clients.openWindow(event.notification.data.url)
-			}
-		})
-	}
+	self.addEventListener("notificationclick", (event) => {
+		event.stopImmediatePropagation()
+		event.notification.close()
+		const target = event.notification.data?.url || event.action || self.location.origin
+		event.waitUntil(clients.openWindow(target))
+	})
 } catch (error) {
 	console.log("Failed to initialize Firebase", error)
 }

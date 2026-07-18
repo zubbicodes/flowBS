@@ -31,6 +31,9 @@ Set these in Coolify before deploying:
 SITE_NAME=your-hrms-domain.com
 FLOW_SITE_URL=https://your-hrms-domain.com
 FLOW_SUPPORT_EMAIL=support@yourcompany.com
+FLOW_FIREBASE_WEB_CONFIG={"apiKey":"...","authDomain":"...firebaseapp.com","projectId":"...","storageBucket":"...firebasestorage.app","messagingSenderId":"...","appId":"..."}
+FLOW_FIREBASE_VAPID_PUBLIC_KEY=your-public-web-push-certificate-key
+FLOW_FIREBASE_SERVICE_ACCOUNT_B64=base64-encoded-service-account-json
 ADMIN_PASSWORD=use-a-strong-admin-password
 MYSQL_ROOT_PASSWORD=use-a-strong-db-root-password
 DEVELOPER_MODE=0
@@ -57,6 +60,55 @@ include `https://` or a port. In Coolify, set the gateway service domain to
 
 Do not assign the public domain directly to the `frappe` service. Doing so
 bypasses the `/socket.io` route and Raven realtime events will not connect.
+
+## Configure Web/PWA push notifications
+
+FLOW uses one Firebase project for browser notifications in FlowHR and
+FlowConnect. No Android or iOS Firebase app is required.
+
+1. In Firebase Console, create or select the FLOW project and add a **Web app**.
+2. Copy the Web app's `firebaseConfig` object as one-line JSON into
+   `FLOW_FIREBASE_WEB_CONFIG`.
+3. Under **Project settings > Cloud Messaging > Web configuration > Web Push
+   certificates**, generate a key pair and put the public key in
+   `FLOW_FIREBASE_VAPID_PUBLIC_KEY`.
+4. Confirm that **Firebase Cloud Messaging API (HTTP v1)** is enabled for the
+   project. Under **Project settings > Service accounts**, generate a new private key.
+   Base64-encode the complete downloaded JSON file and store only that encoded
+   value in `FLOW_FIREBASE_SERVICE_ACCOUNT_B64`.
+5. Add all three values to Coolify and redeploy. The Compose file forwards them
+   only to the `frappe` service. Never commit the service-account JSON or its
+   encoded value.
+
+PowerShell command for step 4:
+
+```powershell
+[Convert]::ToBase64String([IO.File]::ReadAllBytes("C:\path\flow-firebase-admin.json"))
+```
+
+After deployment, sign in to each PWA and enable notifications once. Browser
+permission is shared by the site origin, while FLOW stores separate FlowHR and
+FlowConnect registrations so each product can respect its own preferences.
+
+To send a test from the signed-in browser console after enabling notifications:
+
+```js
+fetch('/api/method/hrms.api.push.send_test_notification', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Frappe-CSRF-Token': window.csrf_token || window.frappe?.csrf_token,
+  },
+  body: JSON.stringify({ product: 'FlowConnect' }),
+})
+```
+
+Use `FlowHR` instead to test the HR PWA. The request returns immediately and a
+short-queue worker sends the notification. Delivery failures appear in Frappe's
+Error Log. Standard Notification Log records, FlowHR PWA notifications, and
+FlowConnect messages are routed automatically. Invalid Firebase registrations
+are removed after rejected sends, and registrations not refreshed for two
+months are pruned by the scheduler.
 
 ## Verify realtime messaging
 

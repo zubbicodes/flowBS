@@ -65,15 +65,13 @@ const registerServiceWorker = async () => {
 		let serviceWorkerURL = "/assets/hrms/frontend/sw.js"
 		let config = ""
 
-		if (window.frappe?.boot?.push_relay_server_url) {
-			try {
-				config = await window.frappePushNotification.fetchWebConfig()
-				serviceWorkerURL = `${serviceWorkerURL}?config=${encodeURIComponent(
-					JSON.stringify(config)
-				)}`
-			} catch (err) {
-				console.error("Failed to fetch FCM config", err)
-			}
+		try {
+			config = await window.frappePushNotification.fetchWebConfig()
+			serviceWorkerURL = `${serviceWorkerURL}?config=${encodeURIComponent(
+				JSON.stringify(config)
+			)}`
+		} catch (err) {
+			console.info("FLOW push notifications are not configured", err)
 		}
 
 		navigator.serviceWorker

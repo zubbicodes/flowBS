@@ -129,6 +129,10 @@ def mark_all_notifications_as_read() -> None:
 
 @frappe.whitelist()
 def are_push_notifications_enabled() -> bool:
+	from hrms.api.push import is_enabled
+
+	if is_enabled():
+		return True
 	try:
 		return frappe.db.get_single_value("Push Notification Settings", "enable_push_notification_relay")
 	except frappe.DoesNotExistError:

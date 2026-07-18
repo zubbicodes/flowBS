@@ -307,6 +307,9 @@ services:
       - SITE_NAME=${SITE_NAME:?Set your public Frappe site/domain, for example hrms.example.com}
       - FLOW_SITE_URL=${FLOW_SITE_URL:?Set the public FLOW URL, for example https://flow.example.com}
       - FLOW_SUPPORT_EMAIL=${FLOW_SUPPORT_EMAIL:?Set the public FLOW support email}
+      - FLOW_FIREBASE_WEB_CONFIG=${FLOW_FIREBASE_WEB_CONFIG:-}
+      - FLOW_FIREBASE_VAPID_PUBLIC_KEY=${FLOW_FIREBASE_VAPID_PUBLIC_KEY:-}
+      - FLOW_FIREBASE_SERVICE_ACCOUNT_B64=${FLOW_FIREBASE_SERVICE_ACCOUNT_B64:-}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:?Set a strong Frappe Administrator password in Coolify}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:?Set a strong MariaDB root password in Coolify}
       - DEVELOPER_MODE=${DEVELOPER_MODE:-0}

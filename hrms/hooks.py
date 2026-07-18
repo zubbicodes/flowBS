@@ -177,6 +177,9 @@ override_doctype_class = {
 # Hook on document methods and events
 
 doc_events = {
+	"Notification Log": {
+		"after_insert": "hrms.api.push.notify_from_notification_log",
+	},
 	"User": {
 		"validate": [
 			"erpnext.setup.doctype.employee.employee.validate_employee_role",
@@ -250,6 +253,7 @@ scheduler_events = {
 		"hrms.hr.doctype.shift_schedule_assignment.shift_schedule_assignment.process_auto_shift_creation",
 	],
 	"daily": [
+		"hrms.api.push.prune_stale_devices",
 		"hrms.controllers.employee_reminders.send_birthday_reminders",
 		"hrms.controllers.employee_reminders.send_work_anniversary_reminders",
 		"hrms.hr.doctype.daily_work_summary_group.daily_work_summary_group.send_summary",

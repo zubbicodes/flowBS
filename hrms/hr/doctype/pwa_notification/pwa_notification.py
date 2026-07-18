@@ -31,6 +31,23 @@ class PWANotification(Document):
 		self.send_push_notification()
 
 	def send_push_notification(self):
+		from hrms.api.push import enqueue_notification_to_user, is_enabled
+
+		if is_enabled(require_sender=True):
+			enqueue_notification_to_user(
+				user=self.to_user,
+				title=self.reference_document_type or "FlowHR",
+				body=self.message,
+				link=self.get_notification_link(),
+				product="FlowHR",
+				icon=f"{frappe.utils.get_url()}/assets/hrms/manifest/favicon-196.png",
+				data={
+					"reference_doctype": self.reference_document_type or "",
+					"reference_name": self.reference_document_name or "",
+				},
+			)
+			return
+
 		try:
 			from frappe.push_notification import PushNotification
 
