@@ -6,10 +6,15 @@ Use this folder as a Docker Compose deployment in Coolify.
 
 - Resource type: Docker Compose
 - Compose file: `docker/docker-compose.yml`
-- Public service: `frappe`
-- Domain: `https://flow.example.com:8000`
+- Public service: `gateway`
+- Domain: `https://flow.example.com:8080`
 
-The `:8000` in the Coolify domain tells Coolify to route traffic to port 8000 inside the `frappe` container. It does not publish host port 8000, so you can deploy this compose stack multiple times for different clients on the same Coolify server.
+The `:8080` in the Coolify domain tells Coolify to route traffic to the Nginx
+gateway. The gateway sends regular HTTP traffic to Frappe on port 8000 and
+`/socket.io` traffic to Frappe's realtime server on port 9000. Both therefore
+share the same public HTTPS origin, which is required for authenticated Raven
+realtime messaging. It does not publish a host port, so you can deploy this
+compose stack multiple times for different clients on the same Coolify server.
 
 The `frappe` service uses the public `frappe/bench:latest` image directly. It does not build a custom image, which avoids Coolify build timeouts on slow servers.
 
@@ -43,7 +48,26 @@ FAST_START=0
 FlowConnect. Keep deployment credentials and environment-specific values in
 Coolify or an untracked `.env` file; do not commit them.
 
-Use only the hostname for `SITE_NAME`, for example `client1.example.com`. Do not include `https://` or `:8000`. In Coolify, the service domain can still be `https://client1.example.com:8000` so the proxy routes to container port 8000.
+Use only the hostname for `SITE_NAME`, for example `client1.example.com`. Do not
+include `https://` or a port. In Coolify, set the gateway service domain to
+`https://client1.example.com:8080` so the proxy routes to container port 8080.
+
+Do not assign the public domain directly to the `frappe` service. Doing so
+bypasses the `/socket.io` route and Raven realtime events will not connect.
+
+## Verify realtime messaging
+
+After redeploying, sign in and open FlowConnect. Go to **Settings > Help and
+Support** and run the **Realtime Connection Test**. It should report `Pass` and
+usually show `websocket` as the transport.
+
+You can also verify the Socket.IO handshake from a terminal:
+
+```sh
+curl -i 'https://flow.example.com/socket.io/?EIO=4&transport=polling'
+```
+
+A working endpoint returns HTTP 200 and a response beginning with `0{`.
 
 ## Persistent storage
 
@@ -66,4 +90,4 @@ Startup also removes the stale legacy app entry `erpnexthrms` from `sites/apps.t
 
 ## Notes
 
-This compose file is suitable for a simple Coolify deployment. It still uses `bench start`, so treat it as a lightweight self-hosted setup rather than a fully tuned Frappe production stack.
+This compose file is suitable for a simple Coolify deployment. It still uses `bench start`, so treat it as a lightweight self-hosted setup rather than a fully tuned Frappe production stack. Run one `frappe` service instance with this setup; Redis carries Frappe realtime events, but horizontal scaling also requires deliberate proxy and worker configuration.
