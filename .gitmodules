@@ -4,6 +4,7 @@
 [submodule "raven"]
 	path = raven
 	url = https://github.com/zubbicodes/raven.git
-[submodule ".tmp-raven-inspect"]
-	path = .tmp-raven-inspect
-	url = https://github.com/syntaxusman/raven.git
+[submodule "telegram-drive"]
+	path = telegram-drive
+	url = https://github.com/zubbicodes/TelegramDriveFrappe.git
+	branch = main
