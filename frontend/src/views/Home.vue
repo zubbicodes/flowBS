@@ -1,9 +1,9 @@
 <template>
 	<BaseLayout>
 		<template #body>
-			<div class="flex flex-col items-center px-4 pt-5 pb-24 gap-5 bg-gray-50 min-h-full">
+			<div class="flex flex-col items-center my-7 p-4 gap-7">
 				<CheckInPanel />
-				<QuickLinks :items="quickLinks" :title="__('Your workspace')" />
+				<QuickLinks :items="quickLinks" :title="__('Quick Links')" />
 				<RequestPanel />
 			</div>
 		</template>
@@ -21,6 +21,7 @@ import AttendanceIcon from "@/components/icons/AttendanceIcon.vue"
 import ShiftIcon from "@/components/icons/ShiftIcon.vue"
 import LeaveIcon from "@/components/icons/LeaveIcon.vue"
 import ExpenseIcon from "@/components/icons/ExpenseIcon.vue"
+import EmployeeAdvanceIcon from "@/components/icons/EmployeeAdvanceIcon.vue"
 import SalaryIcon from "@/components/icons/SalaryIcon.vue"
 
 const __ = inject("$translate")
@@ -28,51 +29,33 @@ const __ = inject("$translate")
 const quickLinks = [
 	{
 		icon: markRaw(AttendanceIcon),
-		title: __("Attendance"),
-		description: __("Calendar and requests"),
-		route: "AttendanceDashboard",
+		title: __("Request Attendance"),
+		route: "AttendanceRequestFormView",
 	},
 	{
 		icon: markRaw(ShiftIcon),
-		title: __("My Check-ins"),
-		description: __("View check-in history"),
-		route: "EmployeeCheckinListView",
+		title: __("Request a Shift"),
+		route: "ShiftRequestFormView",
 	},
 	{
 		icon: markRaw(LeaveIcon),
-		title: __("Leave"),
-		description: __("Balance and requests"),
-		route: "LeavesDashboard",
+		title: __("Request Leave"),
+		route: "LeaveApplicationFormView",
 	},
 	{
 		icon: markRaw(ExpenseIcon),
-		title: __("Expenses"),
-		description: __("Claims and status"),
-		route: "ExpenseClaimsDashboard",
+		title: __("Claim an Expense"),
+		route: "ExpenseClaimFormView",
+	},
+	{
+		icon: markRaw(EmployeeAdvanceIcon),
+		title: __("Request an Advance"),
+		route: "EmployeeAdvanceFormView",
 	},
 	{
 		icon: markRaw(SalaryIcon),
-		title: __("Salary Slips"),
-		description: __("View payslips"),
+		title: __("View Salary Slips"),
 		route: "SalarySlipsDashboard",
-	},
-	{
-		featherIcon: "briefcase",
-		title: __("Projects"),
-		description: __("Your assigned projects"),
-		href: "/app/project",
-	},
-	{
-		featherIcon: "message-circle",
-		title: __("FlowConnect"),
-		description: __("Messages and channels"),
-		href: "/raven",
-	},
-	{
-		featherIcon: "plus-circle",
-		title: __("Quick Request"),
-		description: __("Submit a leave request"),
-		route: "LeaveApplicationFormView",
 	},
 ]
 </script>

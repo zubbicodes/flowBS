@@ -1,24 +1,19 @@
 <template>
-	<div class="relative flex w-full flex-col overflow-hidden rounded-2xl bg-gray-900 px-5 py-6 text-white shadow-lg">
-		<div class="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-white opacity-5"></div>
-		<div class="absolute -bottom-16 right-10 h-28 w-28 rounded-full bg-white opacity-5"></div>
-		<div class="relative text-xs font-medium uppercase tracking-widest text-gray-400">
-			{{ dayjs().format("dddd, D MMMM") }}
-		</div>
-		<h2 class="relative mt-1 text-xl font-bold text-white">
+	<div class="flex flex-col bg-white rounded w-full py-6 px-4 border-none">
+		<h2 class="text-lg font-bold text-gray-900">
 			{{ __("Hey, {0} 👋", [employee?.data?.first_name]) }}
 		</h2>
 
 		<template v-if="settings.data?.allow_employee_checkin_from_mobile_app">
-			<div class="relative mt-4 text-sm font-medium text-gray-300" v-if="lastLog">
+			<div class="font-medium text-sm text-gray-500 mt-1.5" v-if="lastLog">
 				<span>{{ __("Last {0} was at {1}", [__(lastLogType), formatTimestamp(lastLog.time)]) }}</span>
 				<span class="whitespace-pre"> &middot; </span>
 				<router-link :to="{ name: 'EmployeeCheckinListView' }" v-slot="{ navigate }">
-					<span @click="navigate" class="cursor-pointer text-white underline">{{ __("View history") }}</span>
+					<span @click="navigate" class="underline">View List</span>
 				</router-link>
 			</div>
 			<Button
-				class="relative mt-5 mb-1 py-5 text-base shadow-sm"
+				class="mt-4 mb-1 drop-shadow-sm py-5 text-base"
 				id="open-checkin-modal"
 				@click="handleEmployeeCheckin"
 			>
@@ -32,7 +27,7 @@
 			</Button>
 		</template>
 
-		<div v-else class="relative mt-3 text-sm font-medium text-gray-300">
+		<div v-else class="font-medium text-sm text-gray-500 mt-1.5">
 			{{ dayjs().format("ddd, D MMMM, YYYY") }}
 		</div>
 	</div>
