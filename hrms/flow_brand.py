@@ -11,10 +11,11 @@ BRAND = {
 	"drive": "FlowDrive",
 	"roster": "FlowRoster",
 	"careers": "FlowCareers",
-	"logo": "/assets/hrms/images/flow-logo.png",
+	"logo": "/assets/hrms/images/framework_logo.png",
+	"framework_logo": "/assets/hrms/images/framework_logo.png",
 	"erp_logo": "/assets/hrms/images/flow_erp_logo.png",
 	"hr_logo": "/assets/hrms/images/flow_hr_logo.png",
-	"connect_logo": "/assets/hrms/images/flow_conncet_logo.png",
+	"connect_logo": "/assets/hrms/images/flow_connect_logo.png",
 	"drive_logo": "/assets/hrms/images/flow_drive_logo.png",
 }
 
@@ -39,7 +40,7 @@ def extend_bootinfo(bootinfo):
 	bootinfo.flow_brand = brand
 
 	# Frappe builds the launcher before this extension runs. Apply the dedicated
-	# product logo to each FLOW app while leaving Framework unchanged.
+	# product logo to each FLOW app, including the framework shell itself.
 	for app in bootinfo.get("app_data") or []:
 		identity = " ".join(
 			str(app.get(key) or "")
@@ -53,6 +54,8 @@ def extend_bootinfo(bootinfo):
 			app["app_logo_url"] = brand.connect_logo
 		elif "telegram_drive" in identity or "telegram-drive" in identity or "flowdrive" in identity:
 			app["app_logo_url"] = brand.drive_logo
+		elif "frappe" in identity or "framework" in identity:
+			app["app_logo_url"] = brand.framework_logo
 
 
 def update_website_context(context):

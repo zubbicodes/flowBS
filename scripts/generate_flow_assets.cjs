@@ -3,8 +3,9 @@ const path = require("node:path")
 const sharp = require("sharp")
 
 const root = path.resolve(__dirname, "..")
-const hrLogo = path.join(root, "hrms/public/images/flow-logo.svg")
-const connectLogo = path.join(root, "raven/raven/public/flowconnect-logo.svg")
+const frameworkLogo = path.join(root, "hrms/public/images/framework_logo.png")
+const hrLogo = path.join(root, "hrms/public/images/flow_hr_logo.png")
+const connectLogo = path.join(root, "hrms/public/images/flow_connect_logo.png")
 
 const existingFiles = (directory, extension) =>
   fs.existsSync(directory)
@@ -36,7 +37,7 @@ async function renderSplash(source, target) {
     .png()
     .toBuffer()
   const canvas = sharp({
-    create: { width, height, channels: 4, background: "#f8fafc" },
+    create: { width, height, channels: 4, background: "#ffffff" },
   }).composite([{ input: logo, gravity: "centre" }])
   const ext = path.extname(target).toLowerCase()
   const pipeline = ext === ".jpg" || ext === ".jpeg"
@@ -47,16 +48,19 @@ async function renderSplash(source, target) {
 }
 
 async function main() {
-  const iconTargets = [
-    "hrms/public/images/flow-logo.png",
-    "hrms/public/images/frappe-hr-logo.png",
-    "hrms/hrms.png",
+  const frameworkIconTargets = [
     "hrms/public/manifest/manifest-icon-512.maskable.png",
     "hrms/public/manifest/manifest-icon-192.maskable.png",
     "hrms/public/manifest/favicon-196.png",
     "hrms/public/manifest/apple-icon-180.png",
+  ]
+  const hrIconTargets = [
+    "hrms/public/images/frappe-hr-logo.png",
+    "hrms/hrms.png",
     "frontend/public/favicon.png",
     "roster/public/favicon.png",
+  ]
+  const connectIconTargets = [
     "raven/raven_logo.png",
     "raven/raven/public/raven-logo.png",
     "raven/raven/public/manifest/mstile-150x150.png",
@@ -71,10 +75,14 @@ async function main() {
     "raven/apps/mobile/assets/adaptive-icon.png",
   ]
 
-  for (const relative of iconTargets) {
-    const target = path.join(root, relative)
-    if (fs.existsSync(target)) {
-      await renderLike(relative.startsWith("raven/") ? connectLogo : hrLogo, target)
+  for (const [source, targets] of [
+    [frameworkLogo, frameworkIconTargets],
+    [hrLogo, hrIconTargets],
+    [connectLogo, connectIconTargets],
+  ]) {
+    for (const relative of targets) {
+      const target = path.join(root, relative)
+      if (fs.existsSync(target)) await renderLike(source, target)
     }
   }
 
@@ -89,10 +97,8 @@ async function main() {
   const mobileSplash = path.join(root, "raven/apps/mobile/assets/splash.png")
   if (fs.existsSync(mobileSplash)) await renderSplash(connectLogo, mobileSplash)
 
-  fs.copyFileSync(hrLogo, path.join(root, "hrms/public/manifest/frappe-hr-logo.svg"))
-  fs.copyFileSync(connectLogo, path.join(root, "raven/raven/public/manifest/favicon.svg"))
-
-  console.log(`FLOW assets generated: ${iconTargets.length} icons, ${splashTargets.length + 1} splashes`)
+  const iconCount = frameworkIconTargets.length + hrIconTargets.length + connectIconTargets.length
+  console.log(`FLOW assets generated: ${iconCount} icons, ${splashTargets.length + 1} splashes`)
 }
 
 main().catch((error) => {

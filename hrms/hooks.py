@@ -30,17 +30,17 @@ add_to_apps_screen = [
 # app_include_css = "/assets/hrms/css/hrms.css"
 app_include_js = [
 	"hrms.bundle.js",
-	"/assets/hrms/js/flow_brand.js?v=20260718-product-logos",
+	"/assets/hrms/js/flow_brand.js?v=20260720-product-logos",
 ]
-app_include_css = ["hrms.bundle.css", "/assets/hrms/css/flow_brand.css?v=20260718-product-logos"]
+app_include_css = ["hrms.bundle.css", "/assets/hrms/css/flow_brand.css?v=20260720-product-logos"]
 
 # website
 
 # include js, css files in header of web template
-web_include_css = "/assets/hrms/css/flow_brand.css?v=20260718-green"
-web_include_js = "/assets/hrms/js/flow_brand.js?v=20260718-green"
-brand_html = '<span class="flow-brand"><img src="/assets/hrms/images/flow-logo.png" alt="FLOW">FLOW</span>'
-website_context = {"favicon": "/assets/hrms/images/flow-logo.png"}
+web_include_css = "/assets/hrms/css/flow_brand.css?v=20260720-product-logos"
+web_include_js = "/assets/hrms/js/flow_brand.js?v=20260720-product-logos"
+brand_html = '<span class="flow-brand"><img src="/assets/hrms/images/framework_logo.png" alt="FLOW">FLOW</span>'
+website_context = {"favicon": "/assets/hrms/images/framework_logo.png"}
 update_website_context = "hrms.flow_brand.update_website_context"
 default_mail_footer = """
 <div style="color:#64748b;font-size:12px;margin-top:24px">

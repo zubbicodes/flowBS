@@ -8,9 +8,10 @@
   })
 
   const PRODUCT_LOGOS = Object.freeze({
+    framework: "/assets/hrms/images/framework_logo.png",
     erp: "/assets/hrms/images/flow_erp_logo.png",
     hr: "/assets/hrms/images/flow_hr_logo.png",
-    connect: "/assets/hrms/images/flow_conncet_logo.png",
+    connect: "/assets/hrms/images/flow_connect_logo.png",
     drive: "/assets/hrms/images/flow_drive_logo.png",
   })
 
@@ -58,11 +59,14 @@
       } else if (/telegram-drive|telegram_drive|flowdrive/i.test(identity)) {
         image.src = PRODUCT_LOGOS.drive
         image.alt = BRAND.drive
+      } else if (/frappe-logo|framework-logo/i.test(identity)) {
+        image.src = PRODUCT_LOGOS.framework
+        image.alt = BRAND.master
       }
     })
 
     document.querySelectorAll('link[rel~="icon"]:not([rel="apple-touch-startup-image"])').forEach((icon) => {
-      icon.href = "/assets/hrms/images/flow-logo.png"
+      icon.href = PRODUCT_LOGOS.framework
       icon.type = "image/png"
     })
   }

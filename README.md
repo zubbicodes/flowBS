@@ -1,6 +1,6 @@
 <div align="center">
 	<a href="https://github.com/zubbicodes/erphrm">
-		<img src="hrms/public/images/flow-logo.svg" height="80px" width="80px" alt="FLOW Logo">
+		<img src="hrms/public/images/framework_logo.png" height="80px" width="80px" alt="FLOW Logo">
 	</a>
 	<h2>FLOW Business Suite</h2>
 	<p align="center">FlowERP · FlowHR · FlowConnect · FlowRoster</p>
