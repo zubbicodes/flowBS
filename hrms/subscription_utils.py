@@ -121,7 +121,7 @@ def update_erpnext_roles(disable: bool = True):
 
 
 def set_app_logo():
-	frappe.db.set_single_value("Navbar Settings", "app_logo", "/assets/hrms/images/framework_logo.png")
+	frappe.db.set_single_value("Navbar Settings", "app_logo", "/assets/hrms/images/framework_logo.png?v=20260720-2")
 
 
 def get_erpnext_roles() -> set:

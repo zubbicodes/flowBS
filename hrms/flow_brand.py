@@ -11,12 +11,12 @@ BRAND = {
 	"drive": "FlowDrive",
 	"roster": "FlowRoster",
 	"careers": "FlowCareers",
-	"logo": "/assets/hrms/images/framework_logo.png",
-	"framework_logo": "/assets/hrms/images/framework_logo.png",
-	"erp_logo": "/assets/hrms/images/flow_erp_logo.png",
-	"hr_logo": "/assets/hrms/images/flow_hr_logo.png",
-	"connect_logo": "/assets/hrms/images/flow_connect_logo.png",
-	"drive_logo": "/assets/hrms/images/flow_drive_logo.png",
+	"logo": "/assets/hrms/images/framework_logo.png?v=20260720-2",
+	"framework_logo": "/assets/hrms/images/framework_logo.png?v=20260720-2",
+	"erp_logo": "/assets/hrms/images/flow_erp_logo.png?v=20260720-2",
+	"hr_logo": "/assets/hrms/images/flow_hr_logo.png?v=20260720-2",
+	"connect_logo": "/assets/hrms/images/flow_connect_logo.png?v=20260720-2",
+	"drive_logo": "/assets/hrms/images/flow_drive_logo.png?v=20260720-2",
 }
 
 
@@ -47,15 +47,21 @@ def extend_bootinfo(bootinfo):
 			for key in ("app_name", "name", "title", "app_title", "route")
 		).lower()
 		if "erpnext" in identity or "flowerp" in identity:
-			app["app_logo_url"] = brand.erp_logo
+			logo = brand.erp_logo
 		elif "hrms" in identity or "flowhr" in identity:
-			app["app_logo_url"] = brand.hr_logo
+			logo = brand.hr_logo
 		elif "raven" in identity or "flowconnect" in identity:
-			app["app_logo_url"] = brand.connect_logo
+			logo = brand.connect_logo
 		elif "telegram_drive" in identity or "telegram-drive" in identity or "flowdrive" in identity:
-			app["app_logo_url"] = brand.drive_logo
+			logo = brand.drive_logo
 		elif "frappe" in identity or "framework" in identity:
-			app["app_logo_url"] = brand.framework_logo
+			logo = brand.framework_logo
+		else:
+			continue
+
+		# Current Apps Page reads `logo`; older launchers used `app_logo_url`.
+		app["logo"] = logo
+		app["app_logo_url"] = logo
 
 
 def update_website_context(context):

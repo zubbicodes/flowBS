@@ -8,11 +8,11 @@
   })
 
   const PRODUCT_LOGOS = Object.freeze({
-    framework: "/assets/hrms/images/framework_logo.png",
-    erp: "/assets/hrms/images/flow_erp_logo.png",
-    hr: "/assets/hrms/images/flow_hr_logo.png",
-    connect: "/assets/hrms/images/flow_connect_logo.png",
-    drive: "/assets/hrms/images/flow_drive_logo.png",
+    framework: "/assets/hrms/images/framework_logo.png?v=20260720-2",
+    erp: "/assets/hrms/images/flow_erp_logo.png?v=20260720-2",
+    hr: "/assets/hrms/images/flow_hr_logo.png?v=20260720-2",
+    connect: "/assets/hrms/images/flow_connect_logo.png?v=20260720-2",
+    drive: "/assets/hrms/images/flow_drive_logo.png?v=20260720-2",
   })
 
   const substitutions = [
